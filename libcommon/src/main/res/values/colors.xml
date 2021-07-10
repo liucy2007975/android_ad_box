@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="common_colorPrimary">#3F51B5</color>
+    <color name="common_colorPrimaryDark">#1C1D3B</color>
+    <color name="common_colorAccent">#FF4081</color>
+    <color name="common_white">#FFFFFF</color>
+    <color name="common_gray">#CDC5BF</color>
+    <color name="common_grayDark">#666666</color>
+    <color name="common_black">#000000</color>
+    <color name="common_yellow">#fdfd01</color>
+    <color name="common_fontColor">#99b0ff</color>
+    <color name="common_colorCommandBg">#f39701</color>
+    <color name="common_colorCommandBtn">#f7b551</color>
+    <color name="common_colorButton">#f8671e</color>
+    <color name="common_colorButtonSave">#169ad4</color>
+    <color name="common_colorGrayBg">#f1f1f1</color>
+    <color name="common_transparent">#00000000</color>
+    <color name="common_layout_bg_transparent">#AA6E6E6E</color>
+    <color name="common_layout_bg_press">#AAe1e1e1</color>
+    <color name="common_red">#FF0000</color>
+    <color name="common_mainNoticeBg">#F9D959</color>
+
+</resources>

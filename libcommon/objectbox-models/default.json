@@ -1,0 +1,131 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "1:8353460469071198638",
+      "lastPropertyId": "10:6369981580071848274",
+      "name": "CameraInfoEntity",
+      "properties": [
+        {
+          "id": "1:5148535426769865679",
+          "name": "id"
+        },
+        {
+          "id": "2:4115847030800668560",
+          "name": "portName"
+        },
+        {
+          "id": "3:611835142048715770",
+          "name": "cameraIp"
+        },
+        {
+          "id": "4:7509853854394821339",
+          "name": "portDirect"
+        },
+        {
+          "id": "5:3631959107626882525",
+          "name": "parkCode"
+        },
+        {
+          "id": "6:2341874818613298456",
+          "name": "portId"
+        },
+        {
+          "id": "7:1017666348796752266",
+          "name": "terminalId"
+        },
+        {
+          "id": "8:1300223134207008822",
+          "name": "comment"
+        },
+        {
+          "id": "9:4745837554723329742",
+          "name": "createData"
+        },
+        {
+          "id": "10:6369981580071848274",
+          "name": "deviceType"
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "2:1171188242796586177",
+      "lastPropertyId": "14:8747653077595053489",
+      "name": "CarEnterExitEntity",
+      "properties": [
+        {
+          "id": "1:1976335899810485094",
+          "name": "id"
+        },
+        {
+          "id": "2:2542416767624426337",
+          "name": "parkId"
+        },
+        {
+          "id": "3:5317671945165989064",
+          "indexId": "1:1295403407951087093",
+          "name": "carNo"
+        },
+        {
+          "id": "4:8445751613180589582",
+          "name": "carNoPlateNum"
+        },
+        {
+          "id": "5:2243945813133507864",
+          "name": "carNoExt"
+        },
+        {
+          "id": "6:2900423950284229707",
+          "name": "portName"
+        },
+        {
+          "id": "7:1135874410745361101",
+          "name": "imageUrl"
+        },
+        {
+          "id": "8:6302526572251548514",
+          "name": "terminalId"
+        },
+        {
+          "id": "9:6882739597301621298",
+          "name": "createTime"
+        },
+        {
+          "id": "10:8379803869818521198",
+          "name": "vehicleColor"
+        },
+        {
+          "id": "11:8168896975439163635",
+          "name": "plateColor"
+        },
+        {
+          "id": "12:4309070647563202066",
+          "name": "plateConfidence"
+        },
+        {
+          "id": "13:6208273588526774852",
+          "name": "carType"
+        },
+        {
+          "id": "14:8747653077595053489",
+          "name": "type"
+        }
+      ],
+      "relations": []
+    }
+  ],
+  "lastEntityId": "2:1171188242796586177",
+  "lastIndexId": "1:1295403407951087093",
+  "lastRelationId": "0:0",
+  "lastSequenceId": "0:0",
+  "modelVersion": 4,
+  "modelVersionParserMinimum": 4,
+  "retiredEntityUids": [],
+  "retiredIndexUids": [],
+  "retiredPropertyUids": [],
+  "retiredRelationUids": [],
+  "version": 1
+}

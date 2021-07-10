@@ -1,0 +1,9 @@
+/build
+.externalNativeBuild
+/jniLibs
+.idea/
+*.iml
+/.gradle
+/local.properties
+/app/hs_err_pid93088.log
+/app/replay_pid93088.log

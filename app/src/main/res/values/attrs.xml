@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--add by LinQY-->
+    <declare-styleable name="AVLoadingIndicatorView">
+        <attr name="indicator">
+            <flag name="BallPulse" value="0" />
+            <flag name="BallGridPulse" value="1" />
+            <flag name="BallClipRotate" value="2" />
+            <flag name="BallClipRotatePulse" value="3" />
+            <flag name="SquareSpin" value="4" />
+            <flag name="BallClipRotateMultiple" value="5" />
+            <flag name="BallPulseRise" value="6" />
+            <flag name="BallRotate" value="7" />
+            <flag name="CubeTransition" value="8" />
+            <flag name="BallZigZag" value="9" />
+            <flag name="BallZigZagDeflect" value="10" />
+            <flag name="BallTrianglePath" value="11" />
+            <flag name="BallScale" value="12" />
+            <flag name="LineScale" value="13" />
+            <flag name="LineScaleParty" value="14" />
+            <flag name="BallScaleMultiple" value="15" />
+            <flag name="BallPulseSync" value="16" />
+            <flag name="BallBeat" value="17" />
+            <flag name="LineScalePulseOut" value="18" />
+            <flag name="LineScalePulseOutRapid" value="19" />
+            <flag name="BallScaleRipple" value="20" />
+            <flag name="BallScaleRippleMultiple" value="21" />
+            <flag name="BallSpinFadeLoader" value="22" />
+            <flag name="LineSpinFadeLoader" value="23" />
+            <flag name="TriangleSkewSpin" value="24" />
+            <flag name="Pacman" value="25" />
+            <flag name="BallGridBeat" value="26" />
+            <flag name="SemiCircleSpin" value="27" />
+        </attr>
+        <attr name="indicator_color" format="color" />
+    </declare-styleable>
+    <declare-styleable name="SwipeMenu">
+        <attr name="anim_duration" format="integer" />
+    </declare-styleable>
+    <!--end-->
+
+    <declare-styleable name="CropImageView">
+        <attr name="civMaskAlpha" format="integer"/>
+        <attr name="civShowGuideLine" format="boolean"/>
+        <attr name="civLineColor" format="color"/>
+        <attr name="civLineWidth" format="dimension"/>
+        <attr name="civShowMagnifier" format="boolean"/>
+        <attr name="civMagnifierCrossColor" format="color"/>
+        <attr name="civGuideLineWidth" format="dimension"/>
+        <attr name="civGuideLineColor" format="color"/>
+        <attr name="civPointFillColor" format="color"/>
+        <attr name="civPointFillAlpha" format="integer"/>
+    </declare-styleable>
+
+    <!--拍摄圆形view-->
+    <declare-styleable name="CameraLayout">
+        <attr name="camera_circle_width" format="dimension"/>
+        <attr name="camera_circle_height" format="dimension"/>
+        <attr name="camera_border_width" format="dimension"/>
+    </declare-styleable>
+
+    <!--修复拉伸、拍摄圆形view、指定宽动态计算高度-->
+    <declare-styleable name="CircleCameraLayout">
+        <attr name="circle_camera_width" format="dimension" />
+        <attr name="circle_camera_height" format="dimension" />
+        <attr name="border_width" format="dimension" />
+    </declare-styleable>
+
+    <!--圆形的view带颜色边框-->
+    <declare-styleable name="CircleImageView">
+        <attr name="civ_border_width" format="dimension" />
+        <attr name="civ_border_color" format="color" />
+        <attr name="civ_border_overlay" format="boolean" />
+        <attr name="civ_fill_color" format="color" />
+    </declare-styleable>
+
+
+    <!-- 自定义密码输入框-->
+    <declare-styleable name="PassCodeView">
+        <!--输入框的数量-->
+        <attr name="icv_et_number" format="integer" />
+        <!--输入框的宽度-->
+        <attr name="icv_et_width" format="dimension|reference" />
+        <!--输入框之间的分割线-->
+        <attr name="icv_et_divider_drawable" format="reference" />
+        <!--输入框文字颜色-->
+        <attr name="icv_et_text_color" format="color|reference" />
+        <!--输入框文字大小-->
+        <attr name="icv_et_text_size" format="dimension|reference" />
+        <!--输入框获取焦点时边框-->
+        <attr name="icv_et_bg_focus" format="reference" />
+        <!--输入框没有焦点时边框-->
+        <attr name="icv_et_bg_normal" format="reference" />
+        <!--是否是密码模式-->
+        <attr name="icv_et_pwd" format="boolean" />
+        <!--密码模式时,圆的半径-->
+        <attr name="icv_et_pwd_radius" format="dimension|reference" />
+    </declare-styleable>
+
+    <declare-styleable name="HorizontalProgressBar">
+        <attr name="progress_color" format="color" />
+        <attr name="progress_bg" format="color" />
+    </declare-styleable>
+
+</resources>

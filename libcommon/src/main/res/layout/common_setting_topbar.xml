@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/common_topbar"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/common_black"
+    android:orientation="vertical"
+    android:gravity="center_vertical">
+
+    <!--<com.zhy.android.percent.support.PercentRelativeLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:gravity="center_vertical">-->
+
+        <!--<TextView-->
+            <!--android:id="@+id/common_leftBtn"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="match_parent"-->
+            <!--app:layout_widthPercent="20%w"-->
+            <!--android:layout_alignParentLeft="true"-->
+            <!--android:gravity="center"-->
+            <!--android:background="@drawable/common_layout_tran_bg"-->
+            <!--android:textColor="@color/common_white"-->
+            <!--tools:text="返回"-->
+            <!--app:layout_textSizePercent="5%w"/>-->
+
+        <!--<TextView-->
+            <!--android:id="@+id/common_topbar_title"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_centerInParent="true"-->
+            <!--android:gravity="center"-->
+            <!--android:textColor="@color/common_white"-->
+            <!--tools:text="货道管理"-->
+            <!--app:layout_textSizePercent="6%w" />-->
+
+        <!--<TextView-->
+            <!--android:id="@+id/common_rightBtn"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="match_parent"-->
+            <!--app:layout_widthPercent="20%w"-->
+            <!--android:layout_alignParentRight="true"-->
+            <!--android:gravity="center"-->
+            <!--android:background="@drawable/common_layout_tran_bg"-->
+            <!--android:textColor="@color/common_white"-->
+            <!--tools:text="保存"-->
+            <!--app:layout_textSizePercent="5%w" />-->
+    <!--</com.zhy.android.percent.support.PercentRelativeLayout>-->
+</LinearLayout>

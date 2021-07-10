@@ -1,0 +1,5 @@
+include ':app',':libcommon','module_huoyan','AndroidAsync'
+//include 'slf4j-android-1.6.1-RC1'
+include ':apache-ftpserver-1.1.1:core'
+include ':apache-ftpserver-1.1.1:ftplet-api'
+//include ':fileobserver'

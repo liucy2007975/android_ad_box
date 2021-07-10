@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="color_Accent">#FF4081</color>
+    <color name="error_color_material">#f4511e</color>
+    <color name="face_hint_text_color">#07fefe</color>
+    <color name="face_hint_text_color2">#27c8b8</color>
+    <color name="face_hint_text_failure">#ff6060</color>
+    <color name="face_hint_text_success">#4fe69e</color>
+    <color name="face_recognize_text">#ff4646</color>
+    <color name="green">#6aff00</color>
+    <color name="grey">#979797</color>
+
+    <!--add by  LinQY-->
+    <color name="color_e8ebe4">#e8ebe4</color>
+    <color name="color_888888">#888888</color>
+    <color name="color_fb3c3c">#fb3c3c</color>
+    <color name="color_4ADBBD">#4ADBBD</color>
+    <color name="color_B2F0E4">#B2F0E4</color>
+    <color name="color_cccccc">#cccccc</color>
+    <color name="color_e4e4e4">#e4e4e4</color>
+    <color name="color_F6F6F6">#F6F6F6</color>
+    <!--end-->
+
+    <color name="white">#FFFFFF</color>
+    <color name="color_4b4948">#4b4948</color>
+    <color name="color_999999">#999999</color>
+    <color name="color_e6e6e6">#e6e6e6</color>
+    <color name="color_f5f5f5">#f5f5f5</color>
+    <color name="transparent">#00000000</color>
+    <color name="color_ababab">#ababab</color>
+    <color name="black">#000000</color>
+    <color name="color_333333">#333333</color>
+    <color name="color_666666">#666666</color>
+    <color name="color_444444">#444444</color>
+    <color name="white_transparent">#BBFFFFFF</color>
+    <!--wheel 的颜色值-->
+    <color name="whell_item_bg_select">#efefef</color>
+
+    <!--自定义弹窗背景颜色-->
+    <color name="color_32b16c">#32b16c</color>
+    <color name="color_ea5702">#ea5703</color>
+    <color name="windowBackground">#f5f5f5</color>
+
+    <color name="color_text_gray">#666</color>
+
+    <color name="color_002ea1">#002ea1</color>
+    <color name="color_ea5703">#ea5703</color>
+    <color name="color_7a666666">#7a666666</color>
+    <color name="color_orange">#ff7200</color>
+</resources>

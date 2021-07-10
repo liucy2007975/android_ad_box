@@ -1,0 +1,117 @@
+apply plugin: 'com.android.library'
+//apply plugin: 'kotlin-android'
+//apply plugin: 'kotlin-android-extensions'
+//apply plugin: 'com.google.protobuf'
+android {
+    compileSdkVersion rootProject.ext.compileSdk
+    defaultConfig {
+        multiDexEnabled true
+        minSdkVersion rootProject.ext.minSdk
+        targetSdkVersion rootProject.ext.targetSdk
+        versionCode rootProject.ext.vCode
+        versionName rootProject.ext.vName
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false//是否允许混淆
+            debuggable true
+//            matchingFallbacks = ['beta', 'debug']
+            buildConfigField( "boolean", "enableAES", "$rootProject.ext.enableAES")
+            shrinkResources false
+            zipAlignEnabled true
+        }
+
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField( "boolean", "enableAES", "$rootProject.ext.enableAES")
+            shrinkResources false
+            zipAlignEnabled true
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+            java {
+                srcDir 'src/main/java'
+            }
+        }
+    }
+
+
+}
+
+
+
+dependencies {
+//    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation "com.android.support:appcompat-v7:${rootProject.ext.support}"
+    testImplementation "junit:junit:$rootProject.ext.junitVersion"
+    androidTestImplementation "com.android.support.test:runner:$rootProject.ext.runnerVersion"
+    androidTestImplementation "com.android.support.test.espresso:espresso-core:$rootProject.ext.espressoVersion"
+    //event bus
+    api 'org.greenrobot:eventbus:3.0.0'
+    //rxjava
+    implementation 'io.reactivex.rxjava2:rxjava:2.1.12'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
+    implementation 'com.squareup.okio:okio:1.13.0'
+    //Android-Logger
+    implementation 'com.jakewharton.timber:timber:4.5.1'
+    implementation 'org.slf4j:slf4j-api:1.7.21'
+    implementation 'com.github.tony19:logback-android-core:1.1.1-6'
+    implementation('com.github.tony19:logback-android-classic:1.1.1-6') {
+        // workaround issue #73
+        exclude group: 'com.google.android', module: 'android'
+    }
+    //fastjson
+    api 'com.alibaba:fastjson:1.2.44'
+    //Android Shell
+    api 'com.jaredrummler:android-shell:1.0.0'
+    //rxlifecycle
+    api 'com.trello.rxlifecycle2:rxlifecycle:2.2.1'
+    api 'com.trello.rxlifecycle2:rxlifecycle-android:2.2.1'
+    api 'com.trello.rxlifecycle2:rxlifecycle-components:2.2.1'
+    //Essentials
+    implementation 'org.greenrobot:essentials:3.0.0-RC1'
+    //RxNetty
+    api 'io.reactivex:rxnetty-tcp:0.5.3-rc.1'
+    //objectbox
+//    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
+    debugImplementation "io.objectbox:objectbox-android-objectbrowser:$objectboxVersion"
+//    betaImplementation  "io.objectbox:objectbox-android-objectbrowser:$objectboxVersion"
+    releaseImplementation "io.objectbox:objectbox-android:$objectboxVersion"
+//    kapt "io.objectbox:objectbox-processor:$objectboxVersion"
+    // some useful Kotlin extension functions
+    implementation "io.objectbox:objectbox-kotlin:$objectboxVersion"
+
+    //添加 zxing
+//    compile 'com.google.zxing:core:3.3.0'
+    //retrofit2
+    api 'com.squareup.retrofit2:retrofit:2.4.0'
+//    compile 'com.squareup.retrofit2:converter-gson:2.4.0'
+//    implementation 'com.squareup.retrofit2:adapter-rxjava:2.4.0'
+    implementation 'com.squareup.retrofit2:converter-scalars:2.4.0'
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.4.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.9.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.9.0'
+    implementation 'org.ligboy.retrofit2:converter-fastjson-android:2.1.0'
+
+    //Android Utils工具包
+//    compile 'com.liyi.sutils:sutils:2.0.6'
+    //Android Utils工具包
+    implementation 'com.blankj:utilcode:1.23.7'
+
+    api 'cn.hutool:hutool-all:5.1.3'
+//    api 'com.google.protobuf:protobuf-java:3.5.1'
+//    api 'com.google.protobuf:protoc:3.5.1'
+}
+apply plugin: 'io.objectbox'

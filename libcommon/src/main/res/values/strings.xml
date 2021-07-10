@@ -1,0 +1,5 @@
+<resources>
+    <string name="common_app_name">libcommon</string>
+    <string name="tips">提示</string>
+    <string name="btn_can">取消</string>
+</resources>
