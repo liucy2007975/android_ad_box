@@ -95,11 +95,12 @@ public class AppMain extends BaseApplication {
 
     public void checkAndCreateDefDir() {
         FileUtils.isExist(Constants.APP_DEF_PATH);
-        FileUtils.isExist(Constants.PICTURE_PATH);
+//        FileUtils.isExist(Constants.PICTURE_PATH);
 //        FileUtils.isExist(Constants.ADVERTISEMENT_PATH);
         FileUtils.isExist(Constants.INSTALL_APK_PATH);
         FileUtils.isExist(Constants.VIDEO_PATH);
-        FileUtils.isExist(Constants.SYNC_PATH);
+        FileUtils.isExist(Constants.AUDIO_PATH);
+        FileUtils.isExist(Constants.SYS_CONFIG_PATH);
         FileUtils.isExist(Constants.FTP_DEF_PATH);
     }
 

@@ -17,13 +17,11 @@ public class Constants {
     public static final String FTP_DEF_PATH = Environment.getExternalStorageDirectory().getPath() + "/ftp/";
     public static final String APP_DEF_PATH_IMG = Environment.getExternalStorageDirectory().getPath() + "/ad_box/images/";
     public static final String APP_DEF_PATH_FILE = Environment.getExternalStorageDirectory().getPath() + "/ad_box/files/";
-    public static final String PICTURE_PATH = APP_DEF_PATH + "picture/";
-    public static final String ADVERTISEMENT_PATH = APP_DEF_PATH + "advertisement/";
+//    public static final String PICTURE_PATH = APP_DEF_PATH + "picture/";
     public static final String VIDEO_PATH = APP_DEF_PATH + "video/";
-    public static final String BANNER_PATH = APP_DEF_PATH + "banner/";
-    public static final String STANDBY_AD_PATH = APP_DEF_PATH + "standby/";
+    public static final String AUDIO_PATH = APP_DEF_PATH + "audio/";
     public static final String INSTALL_APK_PATH = APP_DEF_PATH + "app/";
-    public static final String SYNC_PATH = APP_DEF_PATH + "sync/";
+    public static final String SYS_CONFIG_PATH = APP_DEF_PATH + "sysconfig/";
     public static final String USB_PATH = "/mnt/usb_storage/USB_DISK2/udisk0/ad_box/";
 
     /**

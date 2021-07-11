@@ -131,7 +131,6 @@ public class CowService extends Service implements HttpServerRequestCallback {
     private Disposable mDisposableRecreate;
 
     List<String> ipList=new ArrayList<>();
-//    QYNetSDK qyNetSDK=null;
 
 
     FileAlterationObserver observer=null;
@@ -637,7 +636,7 @@ public class CowService extends Service implements HttpServerRequestCallback {
                             baseResponse22.datetime=DateTimeUtils.getFormatedDataString();
                             response.send(JSON.toJSONString(baseResponse22));
 
-                            FileUtils.deleteAllFile(new File(Constants.PICTURE_PATH));
+//                            FileUtils.deleteAllFile(new File(Constants.PICTURE_PATH));
 
                             Flowable.just(0)
                                     .observeOn(Schedulers.io())

@@ -284,7 +284,7 @@ public class CowDNSService extends Service {
                     AppPrefs.getInstance().setTerminalId("");
                     AppPrefs.getInstance().setParkingId("");
 
-                    FileUtils.deleteAllFile(new File(Constants.PICTURE_PATH));
+//                    FileUtils.deleteAllFile(new File(Constants.PICTURE_PATH));
 
 
                     ShellUtils.execCmd("reboot",false);

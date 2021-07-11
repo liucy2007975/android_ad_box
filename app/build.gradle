@@ -275,5 +275,8 @@ dependencies {
     implementation project(':apache-ftpserver-1.1.1:core')
     implementation project(':apache-ftpserver-1.1.1:ftplet-api')
     implementation 'commons-io:commons-io:2.6'
+
+//    implementation 'com.google.android.exoplayer:exoplayer-core:2.10.5'
+//    implementation 'com.google.android.exoplayer:exoplayer-ui:2.10.5'
 }
 apply plugin: 'io.objectbox'
