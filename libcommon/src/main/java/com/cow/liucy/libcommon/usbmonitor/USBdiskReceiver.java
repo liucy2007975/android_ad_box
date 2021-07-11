@@ -6,7 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
+
+import com.cow.liucy.libcommon.logger.AppLogger;
 
 
 public class USBdiskReceiver extends BroadcastReceiver {
@@ -16,14 +17,14 @@ public class USBdiskReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         // TODO Auto-generated method stub
         String action = intent.getAction();
-        Log.e("action===", action);
+        AppLogger.e("action===", action);
         if (action.equals(VolumeInfo.ACTION_USB_DEVICE_ATTACHED)) {
-            // Log.e("action===", "装载");
+            // AppLogger.e("action===", "装载");
         } else if (action.equals(VolumeInfo.ACTION_USB_DEVICE_DETACHED)) {
-            //Log.d("action===", "卸载USB");
+            //AppLogger.d("action===", "卸载USB");
         } else if (action.equals(VolumeInfo.ACTION_VOLUME_STATE_CHANGED)) {
             int intExtra = intent.getIntExtra(VolumeInfo.EXTRA_VOLUME_STATE, VolumeInfo.STATE_UNMOUNTED);
-            Log.e("action===", "ACTION_VOLUME_STATE_CHANGED=intExtra=>>" + intExtra);
+            AppLogger.e("action===", "ACTION_VOLUME_STATE_CHANGED=intExtra=>>" + intExtra);
             if (intExtra == VolumeInfo.STATE_MOUNTED) {
                 processMountedMessage(context);
             }
@@ -41,7 +42,7 @@ public class USBdiskReceiver extends BroadcastReceiver {
     private void processMountedMessage(Context context) {
         String path = Util.getStoragePath(context);
         if (Util.isPathExist(path)) {
-            Log.e(TAG, "into processMountedMessage isPathExist true");
+            AppLogger.e(TAG, "into processMountedMessage isPathExist true");
             Intent intent = new Intent(Constant.ACTION_USB_RECEIVER);
             intent.putExtra("data", "USB_MOUNT");
             intent.putExtra("path", path);

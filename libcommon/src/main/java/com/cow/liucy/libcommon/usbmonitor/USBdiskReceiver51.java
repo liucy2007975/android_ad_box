@@ -8,30 +8,31 @@ import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.cow.liucy.libcommon.logger.AppLogger;
+
 /**
  * 用于监听android 5.1 的u盘插拔
  */
 public class USBdiskReceiver51 extends BroadcastReceiver {
-    private static final String TAG = "USBdiskReceiver51";
 
     @Override
     public void onReceive(Context context, Intent intent) {
         // TODO Auto-generated method stub
         String action = intent.getAction();
         String path = intent.getData().getPath();
-        Log.e(TAG, action);
+        AppLogger.e( action);
         if (action.equals(VolumeInfo.ACTION_USB_DEVICE_ATTACHED)) {
-            // Log.e("action===", "装载");
+            // AppLogger.e("action===", "装载");
         } else if (action.equals(VolumeInfo.ACTION_USB_DEVICE_DETACHED)) {
-            //Log.d("action===", "卸载USB");
+            //AppLogger.d("action===", "卸载USB");
         } else if (Intent.ACTION_MEDIA_UNMOUNTED.equals(action)) {
-            //Log.d(MainActivity.TAG, "ACTION_MEDIA_UNMOUNTED");
+            //AppLogger.d(MainActivity.TAG, "ACTION_MEDIA_UNMOUNTED");
             // processUnmountedMessage(context, bundle);
         } else if (Intent.ACTION_MEDIA_MOUNTED.equals(action)) {
-            //Log.d(MainActivity.TAG, "ACTION_MEDIA_MOUNTED");
+            //AppLogger.d(MainActivity.TAG, "ACTION_MEDIA_MOUNTED");
             processMountedMessage(context, path);
         } else if (action.equals(Intent.ACTION_MEDIA_REMOVED)) {
-            //Log.d(MainActivity.TAG, "ACTION_MEDIA_REMOVED");
+            //AppLogger.d(MainActivity.TAG, "ACTION_MEDIA_REMOVED");
             // processUnmountedMessage(context, bundle);
         }
     }
@@ -45,9 +46,9 @@ public class USBdiskReceiver51 extends BroadcastReceiver {
     }
 
     private void processMountedMessage(Context context, String path) {
-        Log.e(TAG, "path ==>>" + path);
+        AppLogger.e( "path ==>>" + path);
         if (Util.isPathExist(path)) {
-            Log.e(TAG, "into processMountedMessage isPathExist true");
+            AppLogger.e( "into processMountedMessage isPathExist true");
             Intent intent = new Intent(Constant.ACTION_USB_RECEIVER);
             intent.putExtra("data", "USB_MOUNT");
             intent.putExtra("path", path);
