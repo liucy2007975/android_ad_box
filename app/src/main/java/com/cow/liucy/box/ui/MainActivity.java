@@ -19,10 +19,25 @@ import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 
+import com.blankj.utilcode.util.FileUtils;
+import com.blankj.utilcode.util.ShellUtils;
+import com.cow.liucy.box.service.RebootEvent;
+import com.cow.liucy.box.service.UdiskEvent;
 import com.cow.liucy.face.R;
 import com.cow.liucy.libcommon.base.BaseActivity;
 import com.cow.liucy.libcommon.logger.AppLogger;
 import com.cow.liucy.libcommon.usbmonitor.Constant;
+import com.cow.liucy.libcommon.utils.Constants;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
+import java.io.File;
+
+import cn.hutool.core.io.FileUtil;
+import io.reactivex.Flowable;
+import io.reactivex.schedulers.Schedulers;
 
 public class MainActivity extends BaseActivity {
 
@@ -45,11 +60,18 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         //隐藏顶部，全屏显示
         getSupportActionBar().hide();
-
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
         setContentView(R.layout.activity_main);
+
+
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
     }
 
     @Override
@@ -160,21 +182,29 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
+        EventBus.getDefault().unregister(this);
     }
 
     private class LocalReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             String data = intent.getStringExtra("data");
-            Message msg = Message.obtain();
             AppLogger.d( "收到本地广播==>>" + data);
             if (data.equals("USB_MOUNT")) {
-                //msg.what = MyHandler.USB_MOUNT;
-                msg.obj = intent.getStringExtra("path");
-                AppLogger.d(  "收到本地广播=path=>>" +  msg.obj );
+                String path = intent.getStringExtra("path");
+                AppLogger.d(  "收到本地广播=path=>>" +  path);
+                EventBus.getDefault().post(new UdiskEvent(path));
             }
             //mHandler.sendMessage(msg);
         }
     }
+
+    @Subscribe(threadMode = ThreadMode.BACKGROUND)
+    public void onUdiskEvent(UdiskEvent udiskEvent) {
+        AppLogger.e(">>>>>onUdiskEvent:"+udiskEvent.getPath());
+
+        FileUtils.copyDir(udiskEvent.getPath()+"/sprogram",Constants.APP_DEF_PATH+"video");
+
+    }
+
 }
