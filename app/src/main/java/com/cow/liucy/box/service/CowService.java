@@ -14,10 +14,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.util.Base64;
 
-import com.cow.liucy.box.model.ConfigValue;
-import com.cow.liucy.box.model.qy.AlarmInfoPlate;
-import com.cow.liucy.box.model.qy.PlateResult;
-import com.cow.liucy.box.model.qy.QYPlateInfo;
 import com.cow.liucy.box.service.dns.CowDSNDto;
 import com.cow.liucy.box.service.dns.DeviceInfo;
 import com.cow.liucy.box.ui.MainActivity;
@@ -30,8 +26,6 @@ import com.cow.liucy.libcommon.api.http.model.DeviceLoginRes;
 import com.cow.liucy.libcommon.api.http.model.HeartBeatReq;
 import com.cow.liucy.libcommon.api.http.model.HeartBeatResp;
 
-import com.cow.liucy.libcommon.enums.QianYiPlateColorType;
-import com.cow.liucy.libcommon.eventbus.PlateEvent;
 import com.cow.liucy.libcommon.logger.AppLogger;
 
 import com.cow.liucy.libcommon.utils.AppPrefs;
@@ -46,7 +40,6 @@ import com.cow.liucy.libcommon.utils.Valid;
 import com.cow.liucy.libcommon.huoyan.rxnetty.VzenithNettyManager;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.blankj.utilcode.util.ShellUtils;
 import com.jaredrummler.android.shell.CommandResult;
 import com.jaredrummler.android.shell.Shell;
@@ -62,7 +55,7 @@ import com.koushikdutta.async.http.server.AsyncHttpServer;
 import com.koushikdutta.async.http.server.AsyncHttpServerRequest;
 import com.koushikdutta.async.http.server.AsyncHttpServerResponse;
 import com.koushikdutta.async.http.server.HttpServerRequestCallback;
-import com.koushikdutta.async.parser.StringParser;
+
 
 
 import org.apache.commons.io.monitor.FileAlterationListener;
@@ -84,7 +77,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.nio.charset.Charset;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -114,14 +107,6 @@ public class CowService extends Service implements HttpServerRequestCallback {
      */
     private Map<String,VzenithNettyManager> vzenithNettyManagerMap=new HashMap<>();
 
-
-
-
-
-
-
-
-
     private CompositeDisposable compositeDisposable;
     private     volatile boolean isFinish = false;
 
@@ -129,18 +114,12 @@ public class CowService extends Service implements HttpServerRequestCallback {
     private AsyncHttpServer server;
     private boolean startFlag = false;
     final String[] getUrlList = new String[]{HELLO};
-    final String[] urlList = new String[]{FILE,HTTP_SET,HTTP_RESET,POST_UPLOAD_URL,POST_UPLOAD_IMAGE_URL,HTTP_DEBUG, POST_CUSTOME_URL,RESULT_HEARTBEAT,POST_HUAXIA_URL,POST_QIANYI_URL,POST_HUOYAN_URL};
+    final String[] urlList = new String[]{FILE,HTTP_SET,HTTP_RESET,POST_UPLOAD_URL,POST_UPLOAD_IMAGE_URL,HTTP_DEBUG};
     private static final String HELLO="/status";
     private static final String FILE="/file";
     private static final String HTTP_SET="/set";
     private static final String HTTP_DEBUG="/debug";
     private static final String HTTP_RESET="/reset";
-    private static final String RESULT_HEARTBEAT="/ParkAPI/Heartbeat";
-    private static final String POST_CUSTOME_URL ="/ParkAPI/customer";
-
-    private static final String POST_HUAXIA_URL="/ParkAPI/hx";
-    private static final String POST_QIANYI_URL="/ParkAPI/sendScanCar";
-    private static final String POST_HUOYAN_URL="/ParkAPI/hy";
 
     private static final String POST_UPLOAD_URL="/ParkAPI/upload";
     private static final String POST_UPLOAD_IMAGE_URL="/ParkAPI/uploadImage";
@@ -333,33 +312,33 @@ public class CowService extends Service implements HttpServerRequestCallback {
             startHttpServer();
             stopFTPServer();
             startFTPServer();
-
-            Flowable.just(0)
-                    .observeOn(Schedulers.io())
-                    .subscribe(l->{
-                        try {
-                            //设备登陆
-                            Call<BaseResponse<DeviceLoginRes>> deviceLogin = RetrofitManager.getInstance()
-                                    .postDeviceLogin(AppPrefs.getInstance().getSn().toString());
-                            Response<BaseResponse<DeviceLoginRes>> responseBody = deviceLogin.execute();
-                            if (Valid.valid(responseBody) && Valid.valid(responseBody.body())){
-                                if (responseBody.body().code==200){
-                                    DeviceLoginRes deviceLoginRes=responseBody.body().data;
-                                    if (Valid.valid(deviceLoginRes)){
-                                        AppPrefs.getInstance().setParkingId(deviceLoginRes.getParkingLotId()+"");
-                                        AppPrefs.getInstance().setTerminalId(deviceLoginRes.getDeviceId()+"");
-                                        //设置系统时间
-                                        SystemClock.setCurrentTimeMillis(deviceLoginRes.getTime());    //需要系统权限
-                                    }
-                                    AppLogger.e(">>>>>>>deviceLogin:"+JSON.toJSONString(deviceLoginRes));
-                                }
-                            }
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    },e->{
-                        e.printStackTrace();
-                    });
+//
+//            Flowable.just(0)
+//                    .observeOn(Schedulers.io())
+//                    .subscribe(l->{
+//                        try {
+//                            //设备登陆
+//                            Call<BaseResponse<DeviceLoginRes>> deviceLogin = RetrofitManager.getInstance()
+//                                    .postDeviceLogin(AppPrefs.getInstance().getSn().toString());
+//                            Response<BaseResponse<DeviceLoginRes>> responseBody = deviceLogin.execute();
+//                            if (Valid.valid(responseBody) && Valid.valid(responseBody.body())){
+//                                if (responseBody.body().code==200){
+//                                    DeviceLoginRes deviceLoginRes=responseBody.body().data;
+//                                    if (Valid.valid(deviceLoginRes)){
+//                                        AppPrefs.getInstance().setParkingId(deviceLoginRes.getParkingLotId()+"");
+//                                        AppPrefs.getInstance().setTerminalId(deviceLoginRes.getDeviceId()+"");
+//                                        //设置系统时间
+//                                        SystemClock.setCurrentTimeMillis(deviceLoginRes.getTime());    //需要系统权限
+//                                    }
+//                                    AppLogger.e(">>>>>>>deviceLogin:"+JSON.toJSONString(deviceLoginRes));
+//                                }
+//                            }
+//                        } catch (IOException e) {
+//                            e.printStackTrace();
+//                        }
+//                    },e->{
+//                        e.printStackTrace();
+//                    });
             cancelReconnect();
         }else{
             AppLogger.e(">>>>设备还未配置IP地址");
@@ -396,76 +375,73 @@ public class CowService extends Service implements HttpServerRequestCallback {
         AppLogger.e(">>>>>>cowHttpService onStartCommand>>>>:");
         showNotification();
 
-//        AppPrefs.getInstance().setTerminalId(1+"");
-//        AppPrefs.getInstance().setParkingId(1+"");
-
-        //HTTP心跳时间同步定时任务
-        Flowable.interval(5, 60*5, TimeUnit.SECONDS)
-                .subscribe(l -> {
-                    if (Valid.valid(AppPrefs.getInstance().getTerminalId())) {
-                        HeartBeatReq heartBeatReq=new HeartBeatReq();
-                        heartBeatReq.setDeviceId(Long.parseLong(AppPrefs.getInstance().getTerminalId()));
-                        heartBeatReq.setLastUpdateTime(DateTimeUtils.getFormatedDataString());
-                        heartBeatReq.setVersion(BuildConfig.VERSION_NAME + "-" + BuildConfig.VERSION_CODE);
-                        RetrofitManager.getInstance().postDeviceHeartbeatV2(heartBeatReq)
-                                .subscribe(response->{
-                                    if (response!=null && response.code==200){
-                                            HeartBeatResp heartBeatResp=response.data;
-                                            if (heartBeatResp!=null && heartBeatResp.getType()==1){
-                                                    if (Valid.valid(heartBeatResp.getDownloadUrl()) && !heartBeatResp.getDownloadUrl().equalsIgnoreCase("null")){
-                                                        if (updating==true){
-                                                            return;
-                                                        }
-                                                        updating=true;
-                                                        FileUtils.deleteFile("/sdcard/smartparking/update.apk");
-                                                        AsyncHttpGet request=new AsyncHttpGet(heartBeatResp.getDownloadUrl());
-                                                        AsyncHttpClient.getDefaultInstance().executeFile(request, "/sdcard/smartparking/update.apk", new AsyncHttpClient.FileCallback() {
-                                                            @Override
-                                                            public void onCompleted(Exception e, AsyncHttpResponse response, File result) {
-                                                                if (e != null) {
-                                                                    e.printStackTrace();
-                                                                    return;
-                                                                }
-                                                                AppLogger.e("my file is available at: " + result.getPath());
-                                                                execCommand("pm", "install", "-r", result.getPath());
-                                                            }
-                                                        });
-                                                    }
-                                            }
-                                    }else{
-                                        AppLogger.e(">>>>心跳失败，code:"+response.code);
-                                    }
-                                },e->{
-                                    AppLogger.e(">>>>心跳失败");
-                                    e.printStackTrace();
-                                });
-
-                    }else{
-                        AppLogger.e(">>>设备暂未初始化>>>即将进行设备登陆>>");
-                        try {
-                            //设备登陆
-                            Call<BaseResponse<DeviceLoginRes>> deviceLogin = RetrofitManager.getInstance()
-                                    .postDeviceLogin(AppPrefs.getInstance().getSn().toString());
-                            Response<BaseResponse<DeviceLoginRes>> responseBody = deviceLogin.execute();
-                            if (Valid.valid(responseBody) && Valid.valid(responseBody.body())){
-                                if (responseBody.body().code==200){
-                                    DeviceLoginRes deviceLoginRes=responseBody.body().data;
-                                    if (Valid.valid(deviceLoginRes)){
-                                        AppPrefs.getInstance().setParkingId(deviceLoginRes.getParkingLotId()+"");
-                                        AppPrefs.getInstance().setTerminalId(deviceLoginRes.getDeviceId()+"");
-                                        //设置系统时间
-                                        SystemClock.setCurrentTimeMillis(deviceLoginRes.getTime());    //需要系统权限
-                                    }
-                                    AppLogger.e(">>>>>>>deviceLogin:"+JSON.toJSONString(deviceLoginRes));
-                                }
-                            }
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, e -> {
-                    AppLogger.e(">>>e:" + e.getMessage());
-                });
+//        //HTTP心跳时间同步定时任务
+//        Flowable.interval(5, 60*5, TimeUnit.SECONDS)
+//                .subscribe(l -> {
+//                    if (Valid.valid(AppPrefs.getInstance().getTerminalId())) {
+//                        HeartBeatReq heartBeatReq=new HeartBeatReq();
+//                        heartBeatReq.setDeviceId(Long.parseLong(AppPrefs.getInstance().getTerminalId()));
+//                        heartBeatReq.setLastUpdateTime(DateTimeUtils.getFormatedDataString());
+//                        heartBeatReq.setVersion(BuildConfig.VERSION_NAME + "-" + BuildConfig.VERSION_CODE);
+//                        RetrofitManager.getInstance().postDeviceHeartbeatV2(heartBeatReq)
+//                                .subscribe(response->{
+//                                    if (response!=null && response.code==200){
+//                                            HeartBeatResp heartBeatResp=response.data;
+//                                            if (heartBeatResp!=null && heartBeatResp.getType()==1){
+//                                                    if (Valid.valid(heartBeatResp.getDownloadUrl()) && !heartBeatResp.getDownloadUrl().equalsIgnoreCase("null")){
+//                                                        if (updating==true){
+//                                                            return;
+//                                                        }
+//                                                        updating=true;
+//                                                        FileUtils.deleteFile("/sdcard/smartparking/update.apk");
+//                                                        AsyncHttpGet request=new AsyncHttpGet(heartBeatResp.getDownloadUrl());
+//                                                        AsyncHttpClient.getDefaultInstance().executeFile(request, "/sdcard/smartparking/update.apk", new AsyncHttpClient.FileCallback() {
+//                                                            @Override
+//                                                            public void onCompleted(Exception e, AsyncHttpResponse response, File result) {
+//                                                                if (e != null) {
+//                                                                    e.printStackTrace();
+//                                                                    return;
+//                                                                }
+//                                                                AppLogger.e("my file is available at: " + result.getPath());
+//                                                                execCommand("pm", "install", "-r", result.getPath());
+//                                                            }
+//                                                        });
+//                                                    }
+//                                            }
+//                                    }else{
+//                                        AppLogger.e(">>>>心跳失败，code:"+response.code);
+//                                    }
+//                                },e->{
+//                                    AppLogger.e(">>>>心跳失败");
+//                                    e.printStackTrace();
+//                                });
+//
+//                    }else{
+//                        AppLogger.e(">>>设备暂未初始化>>>即将进行设备登陆>>");
+//                        try {
+//                            //设备登陆
+//                            Call<BaseResponse<DeviceLoginRes>> deviceLogin = RetrofitManager.getInstance()
+//                                    .postDeviceLogin(AppPrefs.getInstance().getSn().toString());
+//                            Response<BaseResponse<DeviceLoginRes>> responseBody = deviceLogin.execute();
+//                            if (Valid.valid(responseBody) && Valid.valid(responseBody.body())){
+//                                if (responseBody.body().code==200){
+//                                    DeviceLoginRes deviceLoginRes=responseBody.body().data;
+//                                    if (Valid.valid(deviceLoginRes)){
+//                                        AppPrefs.getInstance().setParkingId(deviceLoginRes.getParkingLotId()+"");
+//                                        AppPrefs.getInstance().setTerminalId(deviceLoginRes.getDeviceId()+"");
+//                                        //设置系统时间
+//                                        SystemClock.setCurrentTimeMillis(deviceLoginRes.getTime());    //需要系统权限
+//                                    }
+//                                    AppLogger.e(">>>>>>>deviceLogin:"+JSON.toJSONString(deviceLoginRes));
+//                                }
+//                            }
+//                        } catch (IOException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }, e -> {
+//                    AppLogger.e(">>>e:" + e.getMessage());
+//                });
 
 
         return super.onStartCommand(intent, flags, startId);
@@ -473,8 +449,6 @@ public class CowService extends Service implements HttpServerRequestCallback {
 
     //启动Ftp Server
     private void startFTPServer(){
-//            compositeDisposable.add(Flowable.just(0).subscribe(
-//                    l->{
                         ListenerFactory factory = new ListenerFactory();
                         factory.setPort(AppPrefs.getInstance().getFtpPort());
 //                        factory.setServerAddress("192.168.46.125");
@@ -504,35 +478,16 @@ public class CowService extends Service implements HttpServerRequestCallback {
                             e.printStackTrace();
                             AppLogger.e(">>>>FTP Server start failed!");
                         }
-
-//                    },e->{
-//                        e.printStackTrace();
-//                        AppLogger.e(">>>>FTP Server start failed!");
-//                    }
-//            ));
     }
 
     //停止FTP Server
     private void stopFTPServer(){
-//        if (ftpServer!=null) {
-//            compositeDisposable.add(Flowable.just(0).subscribe(
-//                    l -> {
                         if (ftpServer != null) {
                             ftpServer.stop();
                         }
                         ftpServer = null;
                         AppLogger.e(">>>>FTP Server stop success!");
-//                    }, e -> {
-//                        e.printStackTrace();
-//                        AppLogger.e(">>>>FTP Server stop failed!");
-//                    }
-//            ));
-//        }
     }
-
-
-
-
 
 
     private  void clear(){
@@ -559,9 +514,6 @@ public class CowService extends Service implements HttpServerRequestCallback {
         stopFTPServer();
     }
 
-
-
-
     /**
      * 设置Service前台运行，在通知栏显示
      */
@@ -577,49 +529,6 @@ public class CowService extends Service implements HttpServerRequestCallback {
         builder.setContentIntent(pendingIntent);
         Notification notification = builder.build();
         startForeground(1000, notification);
-    }
-
-
-
-
-    /**
-     * 重置应用数据库
-     */
-    @SuppressLint("CheckResult")
-    private void resetApp(AsyncHttpServerRequest request, AsyncHttpServerResponse response) {
-//        response.send(JSON.toJSONString(new ResultInfo<>(1, true, "重置应用通知成功！")));
-//
-//        Observable.just(1)
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(Schedulers.io())
-//                .subscribe(integer -> {
-//                    //                    initAppPrams();
-////                    AppUtils.stopProtoNetty();
-////                    AppUtils.deleteTables();
-////                    FileUtils.deleteAllFile(new File(FaceEngineFactory.fileRootPath));
-////                    AppUtils.reboot(CowService.this);
-//                });
-    }
-
-    /**
-     * 重置应用参数
-     */
-    private void initAppPrams() {
-//        DeviceSetBean deviceSetBean = new DeviceSetBean();
-//        SPUtil.saveDeviceData(DeviceSetBean.BeanName, deviceSetBean);
-//
-//        FacePassConfigBean facePassConfigBean = new FacePassConfigBean();
-//        SPUtil.saveDeviceData(FacePassConfigBean.BeanName, facePassConfigBean);
-//
-//        //访问记录回传地址
-//        SPUtil.setStringSF(Contants.ACCESS_RECORD_HTTP_POST_URL, "");
-//        SPUtil.setBooleanSF(Contants.ACCESS_RECORD_IS_PIC, false);
-//        SPUtil.setBooleanSF(Contants.ACCESS_RECORD_IS_FAIL, false);
-//        //识别距离
-//        SPUtil.setIntergerSF(Contants.SMALL_RECT_SIZE, 3);
-//        SPUtil.setBooleanSF(Contants.SMALL_RECT_CHECK, false);
-//        //出入记录保存时间
-//        SPUtil.setIntergerSF(Contants.ACCESS_RECORD_DELETE_TIME, 365);
     }
 
     private void initHttpServer() {
@@ -665,7 +574,7 @@ public class CowService extends Service implements HttpServerRequestCallback {
                 deviceInfo.setParkingId(AppPrefs.getInstance().getParkingId());
                 deviceInfo.setDeviceId(AppPrefs.getInstance().getTerminalId());
                 baseResponse.data=deviceInfo;//"";
-                baseResponse.message="安居宝停车场数据采集器";
+                baseResponse.message="广告机";
                 response.send(JSON.toJSONString(baseResponse));
                 break;
             case FILE:
@@ -861,34 +770,6 @@ public class CowService extends Service implements HttpServerRequestCallback {
                             }
                         }
 
-
-                        Flowable.just(0)
-                                .observeOn(Schedulers.io())
-                                .subscribe(l->{
-                                    try {
-                                        //设备登陆
-                                        Call<BaseResponse<DeviceLoginRes>> deviceLogin = RetrofitManager.getInstance()
-                                                .postDeviceLogin(deviceSn);
-                                        Response<BaseResponse<DeviceLoginRes>> responseBody = deviceLogin.execute();
-                                        if (Valid.valid(responseBody) && Valid.valid(responseBody.body())){
-                                            if (responseBody.body().code==200){
-                                                DeviceLoginRes deviceLoginRes=responseBody.body().data;
-                                                if (Valid.valid(deviceLoginRes)){
-                                                    AppPrefs.getInstance().setParkingId(deviceLoginRes.getParkingLotId()+"");
-                                                    AppPrefs.getInstance().setTerminalId(deviceLoginRes.getDeviceId()+"");
-                                                    //设置系统时间
-                                                    SystemClock.setCurrentTimeMillis(deviceLoginRes.getTime());    //需要系统权限
-                                                }
-                                                AppLogger.e(">>>>>>>deviceLogin:"+JSON.toJSONString(deviceLoginRes));
-                                            }
-                                        }
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                    }
-                                },e->{
-                                    e.printStackTrace();
-                                });
-
                         BaseResponse baseResponse2=new BaseResponse();
                         baseResponse2.code=0;
                         baseResponse2.datetime=DateTimeUtils.getFormatedDataString();
@@ -910,75 +791,6 @@ public class CowService extends Service implements HttpServerRequestCallback {
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
-                break;
-            case POST_HUAXIA_URL:
-                AppLogger.e(">>>>>>>>>>getContentType:"+request.getBody().getContentType());
-
-
-                break;
-            case POST_QIANYI_URL:
-                AppLogger.e(">>>>>>>>>>getContentType:"+request.getBody().getContentType());
-                /////ParkAPI/sendScanCar
-//                StringParser.forcedCharset=Charset.forName("UTF-8");
-                StringParser.forcedCharset=Charset.forName("GBK");
-                Object body=request.getBody().get();
-                QYPlateInfo qyPlateInfo = JSON.parseObject(body.toString(), QYPlateInfo.class);
-                AppLogger.e(">>>>qyPlateInfo:"+qyPlateInfo.getAlarmInfoPlate().getResult().getPlateResult().getLicense()+"    "+qyPlateInfo.getAlarmInfoPlate().getResult().getPlateResult().getImageFile().length());
-                AlarmInfoPlate alarmInfoPlate=qyPlateInfo.getAlarmInfoPlate();
-                PlateResult plateResult=alarmInfoPlate.getResult().getPlateResult();
-                PlateEvent plateEvent1=new PlateEvent();
-                plateEvent1.setDeviceIp(alarmInfoPlate.getIpaddr());
-                plateEvent1.setNumber(plateResult.getLicense());
-                plateEvent1.setPlateConfidence(plateResult.getConfidence());
-                plateEvent1.setPicdata(Base64.decode(plateResult.getImageFile(),Base64.DEFAULT));
-                try {
-                    plateEvent1.setPlateColor(QianYiPlateColorType.getDescByType(plateResult.getColorType()));
-                    plateEvent1.setVehicleColor("普通车牌");
-                }catch (Exception e){
-                    e.printStackTrace();
-                    plateEvent1.setPlateColor("未知");
-                    plateEvent1.setVehicleColor("未知车牌");
-                }
-                //EventBus发现车牌事件
-                EventBus.getDefault().post(plateEvent1);
-
-                AppLogger.e(">>>>>>>>>>LICENSE:"+plateEvent1.getNumber() );
-                String resp="{\n" +
-                        "\t\"Response_AlarmInfoPlate\": {\n" +
-                        "\t\t\"info\": \"error\",\n" +
-                        "        \"content\":\"retransfer_stop\",\n" +
-                        "\t\t\"channelNum\": 0,\n" +
-                        "\t\t\"serialData\": null\n" +
-                        "\t}\n" +
-                        "}";
-                response.send(resp);
-                break;
-            case POST_HUOYAN_URL:
-                AppLogger.e(">>>>>>>>>>getContentType:"+request.getBody().getContentType());
-
-                break;
-
-            case POST_CUSTOME_URL:
-                AppLogger.e(">>>>>>>>>>getContentType:"+request.getBody().getContentType());
-
-                Object body1=request.getBody().get();
-                 JSONObject jsonObject=JSON.parseObject(new String(body1.toString().getBytes(),Charset.forName("UTF-8")));
-//                String   vehicleLaneKey= jsonObject.get("vehicleLaneKey").toString();
-
-                PlateEvent plateEvent2=new PlateEvent();
-                plateEvent2.setDeviceIp(jsonObject.get(ConfigValue.DEVICE_IP).toString());
-                plateEvent2.setNumber(jsonObject.get(ConfigValue.LICENSE).toString());
-                plateEvent2.setPlateConfidence(Float.parseFloat(jsonObject.get(ConfigValue.CONFIDENCE).toString()));
-                try {
-                    plateEvent2.setPlateColor(ConfigValue.plantColorMap.get(Integer.parseInt(jsonObject.get(ConfigValue.PLATE_COLOR_TYPE).toString())));
-                    plateEvent2.setVehicleColor(ConfigValue.plantTypeMap.get(Integer.parseInt(jsonObject.get(ConfigValue.PLATE_TYPE).toString())));
-                }catch (Exception e){
-                    e.printStackTrace();
-                    plateEvent2.setPlateColor("未知");
-                    plateEvent2.setVehicleColor("未知车牌");
-                }
-                plateEvent2.setPicdata(Base64.decode(jsonObject.get(ConfigValue.IMAGE_FILE).toString(),Base64.DEFAULT));
-//
                 break;
             case POST_UPLOAD_URL:
                 //代理转发至服务器

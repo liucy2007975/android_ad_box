@@ -387,34 +387,6 @@ public class CowDNSService extends Service {
                     }
                 }
 
-
-                Flowable.just(0)
-                        .observeOn(Schedulers.io())
-                        .subscribe(l->{
-                            try {
-                                //设备登陆
-                                Call<BaseResponse<DeviceLoginRes>> deviceLogin = RetrofitManager.getInstance()
-                                        .postDeviceLogin(deviceSn);
-                                Response<BaseResponse<DeviceLoginRes>> responseBody = deviceLogin.execute();
-                                if (Valid.valid(responseBody) && Valid.valid(responseBody.body())){
-                                    if (responseBody.body().code==200){
-                                        DeviceLoginRes deviceLoginRes=responseBody.body().data;
-                                        if (Valid.valid(deviceLoginRes)){
-                                            AppPrefs.getInstance().setParkingId(deviceLoginRes.getParkingLotId()+"");
-                                            AppPrefs.getInstance().setTerminalId(deviceLoginRes.getDeviceId()+"");
-                                            //设置系统时间
-                                            SystemClock.setCurrentTimeMillis(deviceLoginRes.getTime());    //需要系统权限
-                                        }
-                                        AppLogger.e(">>>>>>>deviceLogin:"+JSON.toJSONString(deviceLoginRes));
-                                    }
-                                }
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        },e->{
-                            e.printStackTrace();
-                        });
-
                 Thread.sleep(20000);
                 ShellUtils.execCmd("reboot",false);
 
