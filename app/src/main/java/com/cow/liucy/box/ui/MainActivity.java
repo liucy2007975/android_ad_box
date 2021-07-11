@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -13,6 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 
 import android.view.KeyEvent;
 import android.view.WindowManager;
@@ -24,8 +26,15 @@ import com.cow.liucy.libcommon.base.BaseActivity;
 import com.cow.liucy.libcommon.logger.AppLogger;
 import com.cow.liucy.libcommon.usbmonitor.Constant;
 import com.cow.liucy.libcommon.utils.Constants;
+import com.google.android.exoplayer2.DefaultRenderersFactory;
+import com.google.android.exoplayer2.MediaItem;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.ui.StyledPlayerView;
+import com.google.android.exoplayer2.upstream.BandwidthMeter;
+import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -60,8 +69,20 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
 
         playerView = findViewById(R.id.player_view);
+        SimpleExoPlayer player = new SimpleExoPlayer.Builder(this).build();
+        playerView.setPlayer(player);
 
 
+        // 创建mediaItem
+        MediaItem firstItem = MediaItem.fromUri("file:///sdcard/ad_box/video/001.mp4");
+        MediaItem secondItem =  MediaItem.fromUri("file:///sdcard/ad_box/video/002.mp4");
+        // 添加要播放的媒体项目。
+        player.addMediaItem(firstItem);
+        player.addMediaItem(secondItem);
+        //  准备播放
+        player.prepare();
+        // 开始播放
+        player.play();
 
     }
 
