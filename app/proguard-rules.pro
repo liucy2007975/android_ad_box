@@ -189,8 +189,8 @@
 -dontwarn megvii.facepass.**
 -keep class megvii.facepass.** { *; }
 
--dontwarn com.anjubao.**
--keep class com.anjubao.** { *; }
+-dontwarn com.cow.**
+-keep class com.cow.** { *; }
 
 -keep class com.ajb.smartparking.face.utils.** { *; }
 

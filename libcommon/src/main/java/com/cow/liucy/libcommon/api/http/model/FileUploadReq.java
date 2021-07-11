@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 /**
  * 文件上传对象
- * Created by anjubao on 2018/6/25.
+ * Created by cow on 2018/6/25.
  */
 
 public class FileUploadReq implements Serializable{

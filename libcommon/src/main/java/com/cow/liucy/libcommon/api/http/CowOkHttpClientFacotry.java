@@ -11,7 +11,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 
 /**
- * Created by anjubao on 2017/8/1.
+ * Created by cow on 2017/8/1.
  */
 //OkHttp 工厂方法，设置SSLSocket
 public class CowOkHttpClientFacotry {

@@ -26,7 +26,7 @@ import retrofit2.http.Header;
 import retrofit2.http.POST;
 
 /**
- * Created by anjubao on 2017-7-6.
+ * Created by cow on 2017-7-6.
  */
 
 public class RetrofitManager extends BaseRxScheduler {
@@ -279,14 +279,14 @@ public class RetrofitManager extends BaseRxScheduler {
         return observe(RetrofitManager
                 .getInstance()
                 .getApiService()
-                .postUpload("anjubao",CommonUtils.getSN(),fileUploadReq));
+                .postUpload("cow",CommonUtils.getSN(),fileUploadReq));
     }
 
     public Observable<BaseResponse<Object>> postUpload(String filePath,RequestBody body){
         return observe(RetrofitManager
                 .getInstance()
                 .getApiService()
-                .postUploadJsonBody("anjubao",CommonUtils.getSN(),body));
+                .postUploadJsonBody("cow",CommonUtils.getSN(),body));
     }
 
     /**
@@ -316,7 +316,7 @@ public class RetrofitManager extends BaseRxScheduler {
     }
 
     /**
-     * Created by anjubao on 2017/12/22.
+     * Created by cow on 2017/12/22.
      * Api接口定义
      */
 

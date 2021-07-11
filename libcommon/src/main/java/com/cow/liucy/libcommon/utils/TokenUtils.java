@@ -7,7 +7,7 @@ import java.util.Date;
 import timber.log.Timber;
 
 /**
- * Created by anjubao on 2017/8/16.
+ * Created by cow on 2017/8/16.
  */
 
 public class TokenUtils {

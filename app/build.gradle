@@ -1,7 +1,4 @@
 apply plugin: 'com.android.application'
-//apply plugin: 'kotlin-android'
-
-//apply plugin: 'kotlin-android-extensions'
 
 def APP_ID = "com.cow.liucy"
 def releaseTime() {
@@ -41,10 +38,6 @@ android {
             storePassword 'android'
             keyAlias 'androiddebugkey'
             keyPassword 'android'
-//            storeFile file("test.keystore")
-//            storePassword 'android'
-//            keyAlias 'android'
-//            keyPassword 'android'
         }
     }
 

@@ -18,9 +18,6 @@ import com.cow.liucy.face.BuildConfig;
 import com.cow.liucy.libcommon.api.http.RetrofitManager;
 import com.cow.liucy.libcommon.api.http.model.BaseResponse;
 import com.cow.liucy.libcommon.api.http.model.DeviceLoginRes;
-import com.cow.liucy.libcommon.db.CowBoxStore;
-import com.cow.liucy.libcommon.db.objectbox.CameraInfoEntity;
-import com.cow.liucy.libcommon.db.objectbox.CarEnterExitEntity;
 import com.cow.liucy.libcommon.logger.AppLogger;
 
 import com.cow.liucy.libcommon.utils.AppPrefs;
@@ -56,7 +53,7 @@ import retrofit2.Response;
 
 
 /**
- * Created by anjubao on 2019-03-30.
+ * Created by cow on 2019-03-30.
  */
 
 public class CowDNSService extends Service {
@@ -121,7 +118,7 @@ public class CowDNSService extends Service {
                 .subscribe(l -> {
                     try {
 //                        AppLogger.e(">>>>>>>>发送组播...");
-                        sendMessage(buildAnjubaoDSNDto());
+                        sendMessage(buildcowDSNDto());
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -169,7 +166,7 @@ public class CowDNSService extends Service {
         }
     }
 
-    private void sendMessage(CowDSNDto anjubaoDSNDto) {
+    private void sendMessage(CowDSNDto cowDSNDto) {
 
         try {
             socket1 = new MulticastSocket(BROADCAST_PORT2);
@@ -179,11 +176,11 @@ public class CowDNSService extends Service {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        sendMultiBroadcast(anjubaoDSNDto);
+        sendMultiBroadcast(cowDSNDto);
     }
 
-    private void sendMultiBroadcast(CowDSNDto anjubaoDSNDto) {
-        byte[] bytes = JSON.toJSONString(anjubaoDSNDto).getBytes();
+    private void sendMultiBroadcast(CowDSNDto cowDSNDto) {
+        byte[] bytes = JSON.toJSONString(cowDSNDto).getBytes();
         DatagramPacket packet = new DatagramPacket(bytes, bytes.length, address1, BROADCAST_PORT2);
         try {
             socket1.send(packet);
@@ -202,47 +199,47 @@ public class CowDNSService extends Service {
      */
     private HashMap<String, String> buildHashMap(int result) {
         HashMap<String, String> mDnsMap = new HashMap<>();
-        CowDSNDto anjubaoDSNDto = new CowDSNDto();
+        CowDSNDto cowDSNDto = new CowDSNDto();
 
-        anjubaoDSNDto.setLocalIp(CommonUtils.getIPAddress());
-        anjubaoDSNDto.setMacAddress(CommonUtils.getMacAddress());
-        anjubaoDSNDto.setServerIp(AppPrefs.getInstance().getServer());
-        anjubaoDSNDto.setVersion(BuildConfig.VERSION_NAME + BuildConfig.VERSION_CODE);
+        cowDSNDto.setLocalIp(CommonUtils.getIPAddress());
+        cowDSNDto.setMacAddress(CommonUtils.getMacAddress());
+        cowDSNDto.setServerIp(AppPrefs.getInstance().getServer());
+        cowDSNDto.setVersion(BuildConfig.VERSION_NAME + BuildConfig.VERSION_CODE);
 
-//        AppLogger.e(">>>>>>>>ajb length>>>" + JSON.toJSONString(anjubaoDSNDto).getBytes().length);
-//        AppLogger.e(">>>>>>>>ajb dto>>>" + JSON.toJSONString(anjubaoDSNDto));
-        mDnsMap.put("a", anjubaoDSNDto.getMacAddress());
-        mDnsMap.put("b", anjubaoDSNDto.getLocalIp());
-        mDnsMap.put("c", anjubaoDSNDto.getServerIp());
-        mDnsMap.put("d", anjubaoDSNDto.getVersion());
+//        AppLogger.e(">>>>>>>>ajb length>>>" + JSON.toJSONString(cowDSNDto).getBytes().length);
+//        AppLogger.e(">>>>>>>>ajb dto>>>" + JSON.toJSONString(cowDSNDto));
+        mDnsMap.put("a", cowDSNDto.getMacAddress());
+        mDnsMap.put("b", cowDSNDto.getLocalIp());
+        mDnsMap.put("c", cowDSNDto.getServerIp());
+        mDnsMap.put("d", cowDSNDto.getVersion());
         AppLogger.e(">>>>>>>>>mDnsMap:" + JSON.toJSONString(mDnsMap));
         return mDnsMap;
     }
 
     /**
-     * 生成AnjubaoDSNDto对象
+     * 生成cowDSNDto对象
      */
-    private CowDSNDto buildAnjubaoDSNDto() {
-        CowDSNDto anjubaoDSNDto = new CowDSNDto();
-        anjubaoDSNDto.setLocalIp(CommonUtils.getIPAddress());
+    private CowDSNDto buildcowDSNDto() {
+        CowDSNDto cowDSNDto = new CowDSNDto();
+        cowDSNDto.setLocalIp(CommonUtils.getIPAddress());
 //        String mask=NetUtil.getMaskByBit(Integer.parseInt(AppPrefs.getInstance().getNetMask()));
-        anjubaoDSNDto.setLocalNetMask(CommonUtils.getNetMask());
-        anjubaoDSNDto.setMacAddress(CommonUtils.getMacAddress());
-        anjubaoDSNDto.setLocalGateway(CommonUtils.getGatewayForStatic());
-        anjubaoDSNDto.setServerIp(AppPrefs.getInstance().getServer());
-        anjubaoDSNDto.setElevatorServerIp(AppPrefs.getInstance().getFtpPort()+"");
+        cowDSNDto.setLocalNetMask(CommonUtils.getNetMask());
+        cowDSNDto.setMacAddress(CommonUtils.getMacAddress());
+        cowDSNDto.setLocalGateway(CommonUtils.getGatewayForStatic());
+        cowDSNDto.setServerIp(AppPrefs.getInstance().getServer());
+        cowDSNDto.setElevatorServerIp(AppPrefs.getInstance().getFtpPort()+"");
 //        UDP_PACKET_COUNT++;
 //        if (UDP_PACKET_COUNT>10000){
 //            UDP_PACKET_COUNT=1;
 //        }
-        anjubaoDSNDto.setBuildNo(CowService.uploadCount +"");
-        anjubaoDSNDto.setCellNo(AppPrefs.getInstance().getCellNo());
-        anjubaoDSNDto.setVersion(BuildConfig.VERSION_NAME + "-" + BuildConfig.VERSION_CODE);
-        anjubaoDSNDto.setDeviceSn(AppPrefs.getInstance().getSn());
-//        AppLogger.e(">>>>>>>>ajb length>>>" + JSON.toJSONString(anjubaoDSNDto).getBytes().length);
-//        AppLogger.e(">>>>>>>>ajb dto>>>" + JSON.toJSONString(anjubaoDSNDto));
-//        mDnsMap.put("a", JSON.toJSONString(anjubaoDSNDto));
-        return anjubaoDSNDto;
+        cowDSNDto.setBuildNo(CowService.uploadCount +"");
+        cowDSNDto.setCellNo(AppPrefs.getInstance().getCellNo());
+        cowDSNDto.setVersion(BuildConfig.VERSION_NAME + "-" + BuildConfig.VERSION_CODE);
+        cowDSNDto.setDeviceSn(AppPrefs.getInstance().getSn());
+//        AppLogger.e(">>>>>>>>ajb length>>>" + JSON.toJSONString(cowDSNDto).getBytes().length);
+//        AppLogger.e(">>>>>>>>ajb dto>>>" + JSON.toJSONString(cowDSNDto));
+//        mDnsMap.put("a", JSON.toJSONString(cowDSNDto));
+        return cowDSNDto;
     }
 
     @Override
@@ -269,25 +266,24 @@ public class CowDNSService extends Service {
             String receiver = new String(packet.getData(), StandardCharsets.UTF_8).trim();
             AppLogger.e(">>>>组播接收到的信息:" + receiver);
             //构建对象
-            CowDSNDto anjubaoDSNDto = JSON.parseObject(receiver, CowDSNDto.class);
-            if (Valid.valid(anjubaoDSNDto)) {
-//                if (anjubaoDSNDto.getLocalIp().split("/").length < 2) {
+            CowDSNDto cowDSNDto = JSON.parseObject(receiver, CowDSNDto.class);
+            if (Valid.valid(cowDSNDto)) {
+//                if (cowDSNDto.getLocalIp().split("/").length < 2) {
 //                    AppLogger.e(">>>>>>>>>设置IP错误，格式不对");
 //                    return;
 //                }
-                if (!CommonUtils.getMacAddress().equals(anjubaoDSNDto.getMacAddress())) {
-                    AppLogger.e(">>>>>>远程配置：mac=" + anjubaoDSNDto.getMacAddress() + "不是本机mac,本机=" + CommonUtils.getMacAddress());
+                if (!CommonUtils.getMacAddress().equals(cowDSNDto.getMacAddress())) {
+                    AppLogger.e(">>>>>>远程配置：mac=" + cowDSNDto.getMacAddress() + "不是本机mac,本机=" + CommonUtils.getMacAddress());
                     return;
                 }
                 //重置数据库
-                if (anjubaoDSNDto.getIsRest() == 1) {
+                if (cowDSNDto.getIsRest() == 1) {
                     AppLogger.e("恢复出厂设置");
                     AppPrefs.getInstance().setServer("");
                     AppPrefs.getInstance().setSn("");
                     AppPrefs.getInstance().setTerminalId("");
                     AppPrefs.getInstance().setParkingId("");
-                    CowBoxStore.boxStore.boxFor(CameraInfoEntity.class).removeAll();
-                    CowBoxStore.boxStore.boxFor(CarEnterExitEntity.class).removeAll();
+
                     FileUtils.deleteAllFile(new File(Constants.PICTURE_PATH));
 
 
@@ -296,7 +292,7 @@ public class CowDNSService extends Service {
                     return;
                 }
                 //开启调试模式
-                if (anjubaoDSNDto.getCellNo().equalsIgnoreCase("110")){
+                if (cowDSNDto.getCellNo().equalsIgnoreCase("110")){
 
                     CommandResult resultSetporp = Shell.run("setprop service.adb.tcp.port 5555");
                     CommandResult resultStop = Shell.run("stop adbd");
@@ -308,7 +304,7 @@ public class CowDNSService extends Service {
                 }
 
                 //重启
-                if (anjubaoDSNDto.getIsRestart() == 1) {
+                if (cowDSNDto.getIsRestart() == 1) {
 //                    AppUtils.stopProtoNetty();
 
                     //设置系统初始化标志位
@@ -321,7 +317,7 @@ public class CowDNSService extends Service {
                     return;
                 }
                 //服务器ip
-                String serverIp = anjubaoDSNDto.getServerIp();
+                String serverIp = cowDSNDto.getServerIp();
 //                if (!serverIp.startsWith("http")) {
 //                    serverIp = "http://" + serverIp;
 //                }
@@ -342,7 +338,7 @@ public class CowDNSService extends Service {
 
                 }
                 //设备Sn
-                String deviceSn = anjubaoDSNDto.getDeviceSn();
+                String deviceSn = cowDSNDto.getDeviceSn();
                 if (Valid.valid(deviceSn)) {
                     try {
                         AppPrefs.getInstance().setSn(deviceSn);
@@ -351,14 +347,14 @@ public class CowDNSService extends Service {
                     }
                 }
                 //梯控服务器
-                String elevatorServerIp = anjubaoDSNDto.getElevatorServerIp();
+                String elevatorServerIp = cowDSNDto.getElevatorServerIp();
                 if (Valid.valid(elevatorServerIp) && !elevatorServerIp.equals(AppPrefs.getInstance().getElevatorServer())) {
                     if (elevatorServerIp.split(":").length == 2) {
                         AppPrefs.getInstance().setElevatorServer(elevatorServerIp);
                     }
                 }
                 //楼栋号
-                String buildNo = anjubaoDSNDto.getBuildNo();
+                String buildNo = cowDSNDto.getBuildNo();
                 if (Valid.valid(buildNo)) {
                     try {
                         Integer.parseInt(buildNo);
@@ -368,7 +364,7 @@ public class CowDNSService extends Service {
                     }
                 }
                 //单元号
-                String cellNo = anjubaoDSNDto.getCellNo();
+                String cellNo = cowDSNDto.getCellNo();
                 if (Valid.valid(cellNo)) {
                     try {
                         Integer.parseInt(cellNo);
@@ -378,9 +374,9 @@ public class CowDNSService extends Service {
                     }
                 }
                 //本地ip
-                String ip = anjubaoDSNDto.getLocalIp();
-                String netMask = anjubaoDSNDto.getLocalNetMask();
-                String gateway = anjubaoDSNDto.getLocalGateway();
+                String ip = cowDSNDto.getLocalIp();
+                String netMask = cowDSNDto.getLocalNetMask();
+                String gateway = cowDSNDto.getLocalGateway();
                 if (Valid.valid(ip) && Valid.valid(netMask) && Valid.valid(gateway)) {
                     String localIp = CommonUtils.getIPAddress();
                     String localNetMask = CommonUtils.getNetMask();

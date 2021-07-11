@@ -3,7 +3,7 @@ package com.cow.liucy.libcommon.utils;
 import com.alibaba.fastjson.serializer.PropertyFilter;
 
 /**
- * Created by anjubao on 2019-03-27.
+ * Created by cow on 2019-03-27.
  * fastjson过滤器, 排除int型值为0的字段
  */
 

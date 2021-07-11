@@ -5,7 +5,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import java.io.Serializable;
 
 /**
- * Created by anjubao on 2019-04-01.
+ * Created by cow on 2019-04-01.
  * mDNS配置信息对象
  */
 

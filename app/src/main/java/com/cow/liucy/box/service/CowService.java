@@ -27,19 +27,10 @@ import com.cow.liucy.libcommon.api.CommonConfig;
 import com.cow.liucy.libcommon.api.http.RetrofitManager;
 import com.cow.liucy.libcommon.api.http.model.BaseResponse;
 import com.cow.liucy.libcommon.api.http.model.DeviceLoginRes;
-import com.cow.liucy.libcommon.api.http.model.EntryReq;
-import com.cow.liucy.libcommon.api.http.model.ExitReq;
-import com.cow.liucy.libcommon.api.http.model.FileUploadReq;
 import com.cow.liucy.libcommon.api.http.model.HeartBeatReq;
 import com.cow.liucy.libcommon.api.http.model.HeartBeatResp;
-import com.cow.liucy.libcommon.db.CowBoxStore;
-import com.cow.liucy.libcommon.db.objectbox.CameraInfoEntity;
-import com.cow.liucy.libcommon.db.objectbox.CameraInfoEntity_;
-import com.cow.liucy.libcommon.db.objectbox.CarEnterExitEntity;
-import com.cow.liucy.libcommon.db.objectbox.CarEnterExitEntity_;
+
 import com.cow.liucy.libcommon.enums.QianYiPlateColorType;
-import com.cow.liucy.libcommon.enums.VzenithCarColorType;
-import com.cow.liucy.libcommon.enums.VzenithPlateColorType;
 import com.cow.liucy.libcommon.eventbus.PlateEvent;
 import com.cow.liucy.libcommon.logger.AppLogger;
 
@@ -52,8 +43,6 @@ import com.cow.liucy.libcommon.utils.NetUtil;
 import com.cow.liucy.libcommon.utils.ToastUtils;
 import com.cow.liucy.libcommon.utils.Valid;
 
-import com.cow.liucy.libcommon.huoyan.model.IvsResultResponse;
-import com.cow.liucy.libcommon.huoyan.rxnetty.VzenithNettyEvent;
 import com.cow.liucy.libcommon.huoyan.rxnetty.VzenithNettyManager;
 
 import com.alibaba.fastjson.JSON;
@@ -69,7 +58,6 @@ import com.koushikdutta.async.http.AsyncHttpPost;
 import com.koushikdutta.async.http.AsyncHttpResponse;
 import com.koushikdutta.async.http.Multimap;
 import com.koushikdutta.async.http.NameValuePair;
-import com.koushikdutta.async.http.body.UrlEncodedFormBody;
 import com.koushikdutta.async.http.server.AsyncHttpServer;
 import com.koushikdutta.async.http.server.AsyncHttpServerRequest;
 import com.koushikdutta.async.http.server.AsyncHttpServerResponse;
@@ -98,7 +86,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -107,22 +94,17 @@ import java.util.concurrent.TimeUnit;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.UUID;
-import io.objectbox.Box;
-import io.objectbox.query.Query;
-import io.objectbox.query.QueryBuilder;
 import io.reactivex.Flowable;
-import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Response;
 
 
 /**
- * Created by anjubao on 2019-04-18.
+ * Created by cow on 2019-04-18.
  */
 
 public class CowService extends Service implements HttpServerRequestCallback {
@@ -134,22 +116,11 @@ public class CowService extends Service implements HttpServerRequestCallback {
 
 
 
-    /**
-     * 出入口相机列表
-     */
-    private List<CameraInfoEntity> cameraInfoEntityList=new ArrayList<>();
 
-    /**
-     * 出入口相机列表
-     */
-    private Map<String,CameraInfoEntity> cameraInfoEntityMap=new HashMap<>();
 
-    private Box<CameraInfoEntity> cameraInfoEntityBox;
-    private Box<CarEnterExitEntity> carEnterExitEntityBox;
-    private QueryBuilder<CarEnterExitEntity> carEnterExitEntityQueryBuilder;
-    private Query<CarEnterExitEntity> carEnterExitEntityQuery;
 
-    private Query<CameraInfoEntity> cameraInfoEntityQuery;
+
+
 
     private CompositeDisposable compositeDisposable;
     private     volatile boolean isFinish = false;
@@ -203,9 +174,8 @@ public class CowService extends Service implements HttpServerRequestCallback {
 
 //        setIp("192.168.8.115","255.255.255.0","192.168.8.1");
 
-        initObjectBox();
         onNetWorkReady();
-        AppLogger.e(">>>>>>AnjubaoHttpService onCreate>>>>:");
+        AppLogger.e(">>>>>>cowHttpService onCreate>>>>:");
 
         /**
          * ,删除前7天的过期日记，一天执行一次
@@ -230,8 +200,6 @@ public class CowService extends Service implements HttpServerRequestCallback {
                             AppLogger.e(">>>>>>dateTime:>>>>>"+dateTime);
                             AppLogger.e(">>>>>>设备定时重启>>>>>");
 
-                            //清空上传记录表
-                            carEnterExitEntityBox.removeAll();
 
                             try {
                                 //清空/ftp目录
@@ -303,7 +271,7 @@ public class CowService extends Service implements HttpServerRequestCallback {
                 if (suffix.equalsIgnoreCase("jpg") || suffix.equalsIgnoreCase("json") || suffix.equalsIgnoreCase("jpeg")) {
                     //开启线程将文件上传>>>>>
                     AppLogger.e(">>>>onFileCreate path:" + file.getPath() + ">>>开启线程将文件上传");
-                    EventBus.getDefault().post(new FileUploadEvent(file.getPath()));
+//                    EventBus.getDefault().post(new FileUploadEvent(file.getPath()));
                 }
             }catch (Exception e){
                 e.printStackTrace();
@@ -343,59 +311,6 @@ public class CowService extends Service implements HttpServerRequestCallback {
         }
     }
 
-    @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    public void onFileUploadEvent(FileUploadEvent fileUploadEvent) {
-        try{
-            if (!Valid.valid(CommonUtils.getSN())){
-                AppLogger.e(">>>>>设备SN未初始化，不上传图片数据>>>");
-                return;
-            }
-            File file=new File(fileUploadEvent.getFilePath());
-
-            if (file.getName().endsWith("json")){
-                //转的PC传过来的JSON数据上传
-                AppLogger.e(">>>>PC图片JSON数据上传>>>");
-                String jsonString=new String(FileUtil.readBytes(file.getPath()),Charset.forName("UTF-8"));
-                RequestBody body=RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), jsonString);
-                RetrofitManager.getInstance().postUpload(fileUploadEvent.getFilePath(),body)
-                        .subscribe(response-> {
-                            if (response != null && response.code == 200) {
-                                AppLogger.e(">>>>PC图片JSON数据上传>>>");
-                                FileUtil.del(fileUploadEvent.getFilePath());
-                                uploadCount++;
-                                if (uploadCount>=9999){
-                                    uploadCount=0;
-                                }
-                            }
-                        });
-            }else{
-                //文件上传
-                AppLogger.e(">>>>FTP图片数据上传>>>");
-                FileUploadReq fileUploadReq=new FileUploadReq();
-                fileUploadReq.setDataTime(DateTimeUtils.getFormatedDataString());
-                fileUploadReq.setFilePath(fileUploadEvent.getFilePath());
-                fileUploadReq.setType(3);
-                fileUploadReq.setFileName(file.getName());
-                fileUploadReq.setPic(new String(
-                        Base64.encodeToString( FileUtil.readBytes(file.getPath()), Base64.DEFAULT)
-                ));
-                RetrofitManager.getInstance().postUpload(fileUploadReq)
-                        .subscribe(response-> {
-                            if (response != null && response.code == 200) {
-                                AppLogger.e(">>>>FTP图片数据上传成功>>>");
-                                FileUtil.del(fileUploadReq.getFilePath());
-                                uploadCount++;
-                                if (uploadCount>=9999){
-                                    uploadCount=0;
-                                }
-                            }
-                        });
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-
-    }
 
     /**
      * 重试时间间隔
@@ -411,8 +326,7 @@ public class CowService extends Service implements HttpServerRequestCallback {
         if (Valid.valid(localIp)){
             AppLogger.e(">>>>localIp:"+localIp);
             this.server = new AsyncHttpServer();
-            initObjectBox();
-            initVzenithNettyManager();
+//            initVzenithNettyManager();
 
             stopHttpServer();
             initHttpServer();
@@ -479,7 +393,7 @@ public class CowService extends Service implements HttpServerRequestCallback {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        AppLogger.e(">>>>>>AnjubaoHttpService onStartCommand>>>>:");
+        AppLogger.e(">>>>>>cowHttpService onStartCommand>>>>:");
         showNotification();
 
 //        AppPrefs.getInstance().setTerminalId(1+"");
@@ -552,7 +466,7 @@ public class CowService extends Service implements HttpServerRequestCallback {
                 }, e -> {
                     AppLogger.e(">>>e:" + e.getMessage());
                 });
-        timeSendCarEntryExitRecord();
+
 
         return super.onStartCommand(intent, flags, startId);
     }
@@ -616,154 +530,9 @@ public class CowService extends Service implements HttpServerRequestCallback {
 //        }
     }
 
-    /**
-     * 初始化连接相机SDK
-     */
-    private void initVzenithNettyManager() {
-
-        if (Valid.valid(cameraInfoEntityMap) && Valid.valid(cameraInfoEntityList)){
-
-            clear();//先停止所有相机连接
-            for (CameraInfoEntity cameraInfoEntity:cameraInfoEntityList) {
-
-               if (cameraInfoEntity.getDeviceType()==2){//火眼相机
-                    try {
-                        VzenithNettyManager vzenithNettyManager = new VzenithNettyManager(cameraInfoEntity.getCameraIp(), 8131);
-                        vzenithNettyManager.setNettyEvent(new VzenithNettyEvent() {
-                            @Override
-                            public void venithOnReciveData(String deviceIp, IvsResultResponse ivsResultResponse, byte[] fullImage, byte[] clipImage) {
-                                PlateEvent plateEvent = new PlateEvent();
-                                plateEvent.setNumber(ivsResultResponse.getPlateResult().getLicense());//车牌
-                                plateEvent.setVehicleColor(VzenithCarColorType.getDescByType(ivsResultResponse.getPlateResult().getCarColor()) + "");//车身颜色
-                                plateEvent.setPlateColor(VzenithPlateColorType.getDescByType(ivsResultResponse.getPlateResult().getColorType()) + "");//车牌颜色
-                                plateEvent.setDeviceIp(deviceIp);//相机Ip
-                                plateEvent.setPlateConfidence(ivsResultResponse.getPlateResult().getConfidence());//车牌可信度
-                                plateEvent.setPicdata(fullImage);//车牌图片
-
-                                //EventBus发现车牌事件
-                                EventBus.getDefault().post(plateEvent);
-
-                            }
-                        });
-                        vzenithNettyManager.start();
-                        vzenithNettyManagerMap.put(cameraInfoEntity.getCameraIp(), vzenithNettyManager);
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }else if (cameraInfoEntity.getDeviceType()==3){//芊熠相机
-                    ipList.add(cameraInfoEntity.getCameraIp());
-//                    QYNetSDK qyNetSDK=new QYNetSDK();
-                }
-            }
-
-        }
-
-//        QianYiNettyManager qianYiNettyManager=new QianYiNettyManager("192.168.8.10",40000);
-//        qianYiNettyManager.setNettyEvent(new QianYiNettyEvent() {
-//            @Override
-//            public void venithOnReciveData(String deviceIp) {
-//
-//            }
-//        });
-//        qianYiNettyManager.start();
-    }
-
-
-    /**
-     * 初始化数据库
-     */
-    private void initObjectBox() {
-        cameraInfoEntityBox= CowBoxStore.boxStore.boxFor(CameraInfoEntity.class);
-        cameraInfoEntityQuery=cameraInfoEntityBox.query().order(CameraInfoEntity_.deviceType).build();
-        cameraInfoEntityList=cameraInfoEntityQuery.find();
-
-        carEnterExitEntityBox= CowBoxStore.boxStore.boxFor(CarEnterExitEntity.class);
-        carEnterExitEntityQueryBuilder=carEnterExitEntityBox.query();
-        carEnterExitEntityQuery=carEnterExitEntityQueryBuilder.build();
-        cameraInfoEntityMap.clear();
-        if (Valid.valid(cameraInfoEntityList)){
-            for (CameraInfoEntity cameraInfoEntity: cameraInfoEntityList) {
-                cameraInfoEntityMap.put(cameraInfoEntity.getCameraIp(),cameraInfoEntity);
-            }
-        }
-    }
-
-    /**
-     * 定时发送出入记录
-     */
-    private void timeSendCarEntryExitRecord(){
-        compositeDisposable.add(Observable.just(1)
-                .observeOn(Schedulers.io())
-                .subscribe(integer -> {
-                    while (!isFinish) {
-                        CarEnterExitEntity carEnterExitEntity = carEnterExitEntityBox.query().orderDesc(CarEnterExitEntity_.id).build().findFirst();
-                        if (Valid.valid(carEnterExitEntity)) {
-                            try {
-                                if (carEnterExitEntity.getType()==0){//入场数据上传
-
-                                    EntryReq entryReq=new EntryReq();
-                                    entryReq.setCarType(carEnterExitEntity.getCarType());
-                                    entryReq.setDataProviderId(carEnterExitEntity.getId()+"");
-                                    entryReq.setEntryTime(DateTimeUtils.getCustomizedDateTime(carEnterExitEntity.getCreateTime(),DateTimeUtils.FORMAT_DATETIME_UI));
-                                    entryReq.setLpn(carEnterExitEntity.getCarNo());
-                                    entryReq.setParkingLotBoxId(carEnterExitEntity.getTerminalId());
-                                    entryReq.setParkingLotId(carEnterExitEntity.getParkId());
-                                    entryReq.setPlateColor(carEnterExitEntity.getPlateColor());
-                                    entryReq.setVehicleColor(carEnterExitEntity.getVehicleColor());
-                                    entryReq.setPlateConfidence(carEnterExitEntity.getPlateConfidence());
-                                    AppLogger.e(">>>>发送入场数据:"+JSON.toJSONString(entryReq));
-                                    entryReq.setEntryPicBase64s(new String[]{
-                                            Base64.encodeToString( FileUtil.readBytes(carEnterExitEntity.getImageUrl()), Base64.DEFAULT)
-                                    });
-//                                    AppLogger.e(">>>>base64:"+entryReq.getEntryPicBase64s()[0].substring(0,1000));
-                                    Call<BaseResponse<Object>> call = RetrofitManager.getInstance().postEntry(entryReq);
-                                    Response<BaseResponse<Object>> response = call.execute();
-                                    if (response.isSuccessful()) {
-//                                        AppLogger.e("发送入场记录成功");
-                                        FileUtil.del(carEnterExitEntity.getImageUrl());//删除本地图片文件
-                                        carEnterExitEntityBox.remove(carEnterExitEntity.getId());
-                                    } else {
-                                        AppLogger.e("发送入场记录失败" + response.toString());
-                                    }
-                                }else if (carEnterExitEntity.getType()==1){//出场数据上传
-
-                                    ExitReq exitReq=new ExitReq();
-
-                                    exitReq.setCarType(carEnterExitEntity.getCarType());
-                                    exitReq.setDataProviderId(carEnterExitEntity.getId()+"");
-                                    exitReq.setExitTime(DateTimeUtils.getCustomizedDateTime(carEnterExitEntity.getCreateTime(),DateTimeUtils.FORMAT_DATETIME_UI));
-                                    exitReq.setLpn(carEnterExitEntity.getCarNo());
-                                    exitReq.setParkingLotBoxId(carEnterExitEntity.getTerminalId());
-                                    exitReq.setParkingLotId(carEnterExitEntity.getParkId());
-                                    exitReq.setPlateColor(carEnterExitEntity.getPlateColor());
-                                    exitReq.setVehicleColor(carEnterExitEntity.getVehicleColor());
-                                    exitReq.setPlateConfidence(carEnterExitEntity.getPlateConfidence());
-                                    AppLogger.e(">>>>发送出场数据:"+JSON.toJSONString(exitReq));
-                                    exitReq.setExitPicBase64s(new String[]{
-                                            Base64.encodeToString( FileUtil.readBytes(carEnterExitEntity.getImageUrl()), Base64.DEFAULT)
-                                    });
-                                    Call<BaseResponse<Object>> call = RetrofitManager.getInstance().postExit(exitReq);
-                                    Response<BaseResponse<Object>> response = call.execute();
-                                    if (response.isSuccessful()) {
-//                                        AppLogger.e("发送出场记录成功");
-                                        FileUtil.del(carEnterExitEntity.getImageUrl());//删除本地图片文件
-                                        carEnterExitEntityBox.remove(carEnterExitEntity.getId());
-
-                                    } else {
-                                        AppLogger.e("发送出场记录失败" + response.toString());
-                                    }
-                                }
 
 
 
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        Thread.sleep(1000);
-                    }
-                }));
-    }
 
 
     private  void clear(){
@@ -810,45 +579,7 @@ public class CowService extends Service implements HttpServerRequestCallback {
         startForeground(1000, notification);
     }
 
-    @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    public void saveRecord(PlateEvent plateEvent) {
-        AppLogger.e(">>>>>>>saveRecord>>>"+ plateEvent.getNumber());
-        if (!Valid.valid(AppPrefs.getInstance().getParkingId()) && !Valid.valid(AppPrefs.getInstance().getTerminalId())){
-            AppLogger.e(">>>>>设备还未初始化>>>>");
-            return;
-        }
-        if (Valid.valid(plateEvent)) {
-            //停车记录入库
-            CameraInfoEntity cameraInfoEntity=cameraInfoEntityMap.get(plateEvent.getDeviceIp());
-            CarEnterExitEntity carEnterExitEntity=new CarEnterExitEntity();
-            carEnterExitEntity.setId(0);
-            carEnterExitEntity.setCarNo(plateEvent.getNumber());
-            carEnterExitEntity.setCarType(plateEvent.getType()+"");
-            carEnterExitEntity.setPlateColor(plateEvent.getPlateColor());
-            carEnterExitEntity.setPlateConfidence(plateEvent.getPlateConfidence()+"");
-            carEnterExitEntity.setVehicleColor(plateEvent.getVehicleColor());
-            carEnterExitEntity.setTerminalId(AppPrefs.getInstance().getTerminalId());
-            carEnterExitEntity.setPortName(cameraInfoEntity.getPortName());
-            carEnterExitEntity.setParkId(AppPrefs.getInstance().getParkingId());
-            carEnterExitEntity.setType(cameraInfoEntity.getPortDirect());//进出类型，0：入场，1：出场
-//            Bitmap bitmap3= BitmapFactory.decodeByteArray(plateEvent.getPicdata(),0,plateEvent.getPicdata().length);
-//             com.blankj.utilcode.util.ImageUtils.save(bitmap3,"/sdcard/smartparking/"+plateEvent.getNumber()+".jpg", Bitmap.CompressFormat.JPEG);
-//             if (bitmap3!=null && !bitmap3.isRecycled()){
-//                 bitmap3.recycle();
-//                 bitmap3=null;
-//             }
-            count++;
-            if (count>=100000){
-                count=1;
-            }
-            String parentPath=DateTimeUtils.getCustomizedDateTime(new Date(), "yyyy/MM/dd");
-            String tmpPath = parentPath + "/" + cameraInfoEntity.getCameraIp() + "/" + "_"+(count)+".jpg" ;
-            String filePath = Constants.PICTURE_PATH + tmpPath;
-            FileUtil.writeBytes(plateEvent.getPicdata(),filePath);
-            carEnterExitEntity.setImageUrl(filePath);
-            carEnterExitEntityBox.put(carEnterExitEntity);
-        }
-    }
+
 
 
     /**
@@ -928,7 +659,6 @@ public class CowService extends Service implements HttpServerRequestCallback {
                 baseResponse.datetime=DateTimeUtils.getFormatedDataString();
                 DeviceInfo deviceInfo=new DeviceInfo();
                 deviceInfo.setDeviceSn(AppPrefs.getInstance().getSn());
-                deviceInfo.setCameraInfoEntityList(CowBoxStore.boxStore.boxFor(CameraInfoEntity.class).query().build().find());
                 deviceInfo.setTime(DateTimeUtils.getFormatedDataString());
                 deviceInfo.setUrl(AppPrefs.getInstance().getServer());
                 deviceInfo.setVersion(BuildConfig.VERSION_NAME + "-" + BuildConfig.VERSION_CODE);
@@ -940,44 +670,6 @@ public class CowService extends Service implements HttpServerRequestCallback {
                 break;
             case FILE:
 //                AppLogger.e(">>>>>json:"+request.getBody().getContentType()); ;
-                try {
-                    String json= URLDecoder.decode(request.getBody().get().toString(),"UTF-8");
-                    AppLogger.e(">>>>>json:"+json);
-                    Object parse1 = JSON.parse(json);
-                    String s = parse1.toString();
-                    List<CameraInfoEntity> cameraInfoEntityList= (List<CameraInfoEntity>) JSON.parseArray(s,CameraInfoEntity.class);
-                    if (Valid.valid(cameraInfoEntityList)){
-                        //清空所有
-                        CowBoxStore.boxStore.boxFor(CameraInfoEntity.class).removeAll();
-//                        AppLogger.e(">>>>>removeAll:"+cameraInfoEntityList.size());
-                        for (int i=0;i<cameraInfoEntityList.size();i++){
-                            CameraInfoEntity cameraInfoEntity=cameraInfoEntityList.get(i);
-                            cameraInfoEntity.setId(0);
-                          AppLogger.e(">>>>cameraInfoEntity:"+JSON.toJSONString(cameraInfoEntity));
-                            CowBoxStore.boxStore.boxFor(CameraInfoEntity.class).put(cameraInfoEntity);
-                        }
-                    }
-                    AppLogger.e(">>>>>json:"+JSON.toJSONString(cameraInfoEntityList));
-                    BaseResponse baseResponse1=new BaseResponse();
-                    baseResponse1.code=0;
-                    baseResponse1.datetime=DateTimeUtils.getFormatedDataString();
-                    baseResponse1.data=cameraInfoEntityList;
-                    response.send(JSON.toJSONString(baseResponse1));
-
-                    Flowable.just(0)
-                            .observeOn(Schedulers.io())
-                            .subscribe(l->{
-                                try {
-                                    Thread.sleep(10000);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                                ShellUtils.execCmd("reboot",false);
-                            });
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
                 break;
             case HTTP_DEBUG:
                 //构建对象
@@ -988,10 +680,10 @@ public class CowService extends Service implements HttpServerRequestCallback {
                     Object parse1 = JSON.parse(json12);
                     String s = parse1.toString();
 
-                    CowDSNDto anjubaoDSNDto1 = JSON.parseObject(s, CowDSNDto.class);
-                    if (Valid.valid(anjubaoDSNDto1)) {
+                    CowDSNDto cowDSNDto1 = JSON.parseObject(s, CowDSNDto.class);
+                    if (Valid.valid(cowDSNDto1)) {
                         //开启调试模式
-                        if (anjubaoDSNDto1.getCellNo().equalsIgnoreCase("110")){
+                        if (cowDSNDto1.getCellNo().equalsIgnoreCase("110")){
                             CommandResult resultSetporp = Shell.run("setprop service.adb.tcp.port 5555");
                             CommandResult resultStop = Shell.run("stop adbd");
                             CommandResult resultStart = Shell.run("start adbd");
@@ -1020,17 +712,16 @@ public class CowService extends Service implements HttpServerRequestCallback {
                     Object parse1 = JSON.parse(json1);
                     String s = parse1.toString();
 
-                    CowDSNDto anjubaoDSNDto1 = JSON.parseObject(s, CowDSNDto.class);
-                    if (Valid.valid(anjubaoDSNDto1)) {
+                    CowDSNDto cowDSNDto1 = JSON.parseObject(s, CowDSNDto.class);
+                    if (Valid.valid(cowDSNDto1)) {
                         //重置数据库
-                        if (anjubaoDSNDto1.getIsRest() == 1) {
+                        if (cowDSNDto1.getIsRest() == 1) {
                             AppLogger.e("恢复出厂设置");
                             AppPrefs.getInstance().setServer("");
                             AppPrefs.getInstance().setSn("");
                             AppPrefs.getInstance().setTerminalId("");
                             AppPrefs.getInstance().setParkingId("");
-                            CowBoxStore.boxStore.boxFor(CameraInfoEntity.class).removeAll();
-                            CowBoxStore.boxStore.boxFor(CarEnterExitEntity.class).removeAll();
+
 
                             BaseResponse baseResponse22=new BaseResponse();
                             baseResponse22.code=0;
@@ -1065,18 +756,18 @@ public class CowService extends Service implements HttpServerRequestCallback {
                     Object parse1 = JSON.parse(json);
                     String s = parse1.toString();
 
-                    CowDSNDto anjubaoDSNDto = JSON.parseObject(s, CowDSNDto.class);
-                    if (Valid.valid(anjubaoDSNDto)) {
-//                if (anjubaoDSNDto.getLocalIp().split("/").length < 2) {
+                    CowDSNDto cowDSNDto = JSON.parseObject(s, CowDSNDto.class);
+                    if (Valid.valid(cowDSNDto)) {
+//                if (cowDSNDto.getLocalIp().split("/").length < 2) {
 //                    AppLogger.e(">>>>>>>>>设置IP错误，格式不对");
 //                    return;
 //                }
-//                        if (!CommonUtils.getMacAddress().equals(anjubaoDSNDto.getMacAddress())) {
-//                            AppLogger.e(">>>>>>远程配置：mac=" + anjubaoDSNDto.getMacAddress() + "不是本机mac,本机=" + CommonUtils.getMacAddress());
+//                        if (!CommonUtils.getMacAddress().equals(cowDSNDto.getMacAddress())) {
+//                            AppLogger.e(">>>>>>远程配置：mac=" + cowDSNDto.getMacAddress() + "不是本机mac,本机=" + CommonUtils.getMacAddress());
 //                            return;
 //                        }
 //                        //开启调试模式
-//                        if (anjubaoDSNDto.getCellNo().equalsIgnoreCase("110")){
+//                        if (cowDSNDto.getCellNo().equalsIgnoreCase("110")){
 //
 //                            CommandResult resultSetporp = Shell.run("setprop service.adb.tcp.port 5555");
 //                            CommandResult resultStop = Shell.run("stop adbd");
@@ -1088,9 +779,9 @@ public class CowService extends Service implements HttpServerRequestCallback {
 //                        }
 
                         //服务器ip
-                        String serverIp = anjubaoDSNDto.getServerIp();
+                        String serverIp = cowDSNDto.getServerIp();
 
-                        String ftpPort=anjubaoDSNDto.getElevatorServerIp();
+                        String ftpPort=cowDSNDto.getElevatorServerIp();
                         if (Valid.valid(ftpPort)){
                             try{
                                 int fp= Integer.parseInt(ftpPort);
@@ -1121,7 +812,7 @@ public class CowService extends Service implements HttpServerRequestCallback {
 
                         }
                         //设备Sn
-                        String deviceSn = anjubaoDSNDto.getDeviceSn();
+                        String deviceSn = cowDSNDto.getDeviceSn();
                         if (Valid.valid(deviceSn)) {
                             try {
                                 AppPrefs.getInstance().setSn(deviceSn);
@@ -1130,14 +821,14 @@ public class CowService extends Service implements HttpServerRequestCallback {
                             }
                         }
                         //梯控服务器
-                        String elevatorServerIp = anjubaoDSNDto.getElevatorServerIp();
+                        String elevatorServerIp = cowDSNDto.getElevatorServerIp();
                         if (Valid.valid(elevatorServerIp) && !elevatorServerIp.equals(AppPrefs.getInstance().getElevatorServer())) {
                             if (elevatorServerIp.split(":").length == 2) {
                                 AppPrefs.getInstance().setElevatorServer(elevatorServerIp);
                             }
                         }
                         //楼栋号
-                        String buildNo = anjubaoDSNDto.getBuildNo();
+                        String buildNo = cowDSNDto.getBuildNo();
                         if (Valid.valid(buildNo)) {
                             try {
                                 Integer.parseInt(buildNo);
@@ -1147,7 +838,7 @@ public class CowService extends Service implements HttpServerRequestCallback {
                             }
                         }
                         //单元号
-                        String cellNo = anjubaoDSNDto.getCellNo();
+                        String cellNo = cowDSNDto.getCellNo();
                         if (Valid.valid(cellNo)) {
                             try {
                                 Integer.parseInt(cellNo);
@@ -1157,9 +848,9 @@ public class CowService extends Service implements HttpServerRequestCallback {
                             }
                         }
                         //本地ip
-                        String ip = anjubaoDSNDto.getLocalIp();
-                        String netMask = anjubaoDSNDto.getLocalNetMask();
-                        String gateway = anjubaoDSNDto.getLocalGateway();
+                        String ip = cowDSNDto.getLocalIp();
+                        String netMask = cowDSNDto.getLocalNetMask();
+                        String gateway = cowDSNDto.getLocalGateway();
                         if (Valid.valid(ip) && Valid.valid(netMask) && Valid.valid(gateway)) {
                             String localIp = CommonUtils.getIPAddress();
                             String localNetMask = CommonUtils.getNetMask();
@@ -1223,31 +914,6 @@ public class CowService extends Service implements HttpServerRequestCallback {
             case POST_HUAXIA_URL:
                 AppLogger.e(">>>>>>>>>>getContentType:"+request.getBody().getContentType());
 
-                StringParser.forcedCharset=Charset.forName("UTF-8");
-
-                UrlEncodedFormBody urlEncodedFormBody=request.getBody();
-                Multimap multimap= urlEncodedFormBody.get();
-                String carNo= multimap.getString("car_plate");
-                AppLogger.e(">>>>>>"+carNo);
-                String color=multimap.getString("color");
-                String vehicleType=multimap.getString("VehicleType");
-                //图片base64字符串被decode之后 + 号被替换成空格了，需还原回来
-                String picture=multimap.getString("picture").replaceAll(" ","+");
-                AppLogger.e(">>>>>>picture:"+picture);
-
-                String closeup_pic=multimap.getString("closeup_pic").replaceAll(" ","+");
-                String park_id=multimap.getString("park_id");
-
-                PlateEvent plateEvent=new PlateEvent();
-               CameraInfoEntity cameraInfoEntity= cameraInfoEntityBox.query().equal(CameraInfoEntity_.portName,park_id).build().findFirst();
-                plateEvent.setDeviceIp(cameraInfoEntity.getCameraIp());
-                plateEvent.setNumber(carNo);
-                plateEvent.setPlateColor(color);
-                plateEvent.setVehicleColor(vehicleType);
-                plateEvent.setPlateConfidence(90);
-                plateEvent.setPicdata(Base64.decode(picture,Base64.DEFAULT));
-
-                EventBus.getDefault().post(plateEvent);
 
                 break;
             case POST_QIANYI_URL:
@@ -1456,7 +1122,5 @@ public class CowService extends Service implements HttpServerRequestCallback {
                     e.printStackTrace();
                     ToastUtils.getShortToastByString(this, "设置失败！请输入正确的IP信息");
                 }));
-//            AppPrefs.getInstance().set
-//            AppPrefs.getInstance().setNetMask(mask);
     }
 }

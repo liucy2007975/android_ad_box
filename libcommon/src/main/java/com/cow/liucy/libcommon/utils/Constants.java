@@ -13,10 +13,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Constants {
 
-    public static final String APP_DEF_PATH = Environment.getExternalStorageDirectory().getPath() + "/smartparking/";
+    public static final String APP_DEF_PATH = Environment.getExternalStorageDirectory().getPath() + "/ad_box/";
     public static final String FTP_DEF_PATH = Environment.getExternalStorageDirectory().getPath() + "/ftp/";
-    public static final String APP_DEF_PATH_IMG = Environment.getExternalStorageDirectory().getPath() + "/smartparking/images/";
-    public static final String APP_DEF_PATH_FILE = Environment.getExternalStorageDirectory().getPath() + "/smartparking/files/";
+    public static final String APP_DEF_PATH_IMG = Environment.getExternalStorageDirectory().getPath() + "/ad_box/images/";
+    public static final String APP_DEF_PATH_FILE = Environment.getExternalStorageDirectory().getPath() + "/ad_box/files/";
     public static final String PICTURE_PATH = APP_DEF_PATH + "picture/";
     public static final String ADVERTISEMENT_PATH = APP_DEF_PATH + "advertisement/";
     public static final String VIDEO_PATH = APP_DEF_PATH + "video/";
@@ -25,7 +25,7 @@ public class Constants {
     public static final String INSTALL_APK_PATH = APP_DEF_PATH + "app/";
     public static final String RECORD_PATH = APP_DEF_PATH + "record/";
     public static final String SYNC_PATH = APP_DEF_PATH + "sync/";
-    public static final String USB_PATH = "/mnt/usb_storage/USB_DISK2/udisk0/smartparking/";
+    public static final String USB_PATH = "/mnt/usb_storage/USB_DISK2/udisk0/ad_box/";
 
     /**
      * 是否启用AES加解密数据
@@ -53,11 +53,6 @@ public class Constants {
     public static AtomicInteger biz10001IntSuccess = new AtomicInteger(0);
     public static AtomicInteger biz10001IntFaild = new AtomicInteger(0);
 
-    //nats route url 模板
-    public static String natsRouteUrl="nats-route://nats_route_user:T0pS3cr3tCluster@%s:5222";
-
-    //nats url 模板
-    public static String natsUrl="nats://AnjubaoClient:T0pS3cr3tClient@%s:4222";
 
     //远端UDP端口
     public static int localUdpRecPort=55640;

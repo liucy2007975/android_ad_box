@@ -5,7 +5,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
 /**
- * Created by anjubao on 2017/12/22.
+ * Created by cow on 2017/12/22.
  *  封装 Rx 线程相关
  */
 

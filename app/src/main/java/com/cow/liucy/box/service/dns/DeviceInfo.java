@@ -1,15 +1,11 @@
 package com.cow.liucy.box.service.dns;
 
-import com.cow.liucy.libcommon.db.objectbox.CameraInfoEntity;
-
 import java.io.Serializable;
-import java.util.List;
 
 public class DeviceInfo implements Serializable {
 
     private String deviceSn;
     private String time;
-    private List<CameraInfoEntity> cameraInfoEntityList;
     private String url;
     private String version;
     private String parkingId;
@@ -29,14 +25,6 @@ public class DeviceInfo implements Serializable {
 
     public void setTime(String time) {
         this.time = time;
-    }
-
-    public List<CameraInfoEntity> getCameraInfoEntityList() {
-        return cameraInfoEntityList;
-    }
-
-    public void setCameraInfoEntityList(List<CameraInfoEntity> cameraInfoEntityList) {
-        this.cameraInfoEntityList = cameraInfoEntityList;
     }
 
     public String getUrl() {

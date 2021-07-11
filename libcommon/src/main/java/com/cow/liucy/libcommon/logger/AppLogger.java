@@ -22,7 +22,7 @@ import timber.log.Timber;
 
 /**
  * Logger类
- * Created by anjubao on 22/12/17.
+ * Created by cow on 22/12/17.
  */
 
 public class AppLogger {

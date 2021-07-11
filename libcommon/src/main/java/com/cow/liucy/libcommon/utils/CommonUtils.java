@@ -32,7 +32,7 @@ import static com.cow.liucy.libcommon.utils.Constants.CMD_SERIAL_NO;
 
 
 /**
- * Created by anjubao on 2017/8/24.
+ * Created by cow on 2017/8/24.
  */
 
 public class CommonUtils {

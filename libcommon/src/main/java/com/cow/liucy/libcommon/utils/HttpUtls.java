@@ -24,7 +24,7 @@ import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
 
 /**
- * Created by anjubao on 2018-01-10.
+ * Created by cow on 2018-01-10.
  */
 
 public class HttpUtls {

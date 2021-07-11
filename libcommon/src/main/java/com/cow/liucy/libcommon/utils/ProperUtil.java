@@ -9,7 +9,7 @@ import java.nio.charset.Charset;
 import java.util.Properties;
 
 /**
- * Created by anjubao on 2018-01-08.
+ * Created by cow on 2018-01-08.
  */
 
 public class ProperUtil {

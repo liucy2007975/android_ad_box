@@ -8,7 +8,7 @@ import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Function;
 
 /**
- * Created by anjubao on 2017/12/22.
+ * Created by cow on 2017/12/22.
  * 对返回数据进行变换
  */
 
