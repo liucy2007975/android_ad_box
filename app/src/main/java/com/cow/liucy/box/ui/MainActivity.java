@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import com.cow.liucy.face.R;
-import com.cow.liucy.hdxm.libcommon.base.BaseActivity;
+import com.cow.liucy.libcommon.base.BaseActivity;
 
 public class MainActivity extends BaseActivity {
 

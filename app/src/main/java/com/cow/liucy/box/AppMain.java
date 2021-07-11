@@ -7,14 +7,14 @@ import com.cow.liucy.box.service.CowService;
 import com.cow.liucy.box.service.dns.CowDNSService;
 import com.cow.liucy.face.BuildConfig;
 
-import com.cow.liucy.hdxm.libcommon.base.BaseApplication;
-import com.cow.liucy.hdxm.libcommon.db.CowBoxStore;
-import com.cow.liucy.hdxm.libcommon.db.objectbox.MyObjectBox;
-import com.cow.liucy.hdxm.libcommon.logger.AppLogger;
-import com.cow.liucy.hdxm.libcommon.utils.Constants;
-import com.cow.liucy.hdxm.libcommon.utils.CrashUtils;
-import com.cow.liucy.hdxm.libcommon.utils.FileUtils;
-import com.cow.liucy.hdxm.libcommon.utils.Utils;
+import com.cow.liucy.libcommon.base.BaseApplication;
+import com.cow.liucy.libcommon.db.CowBoxStore;
+import com.cow.liucy.libcommon.db.objectbox.MyObjectBox;
+import com.cow.liucy.libcommon.logger.AppLogger;
+import com.cow.liucy.libcommon.utils.Constants;
+import com.cow.liucy.libcommon.utils.CrashUtils;
+import com.cow.liucy.libcommon.utils.FileUtils;
+import com.cow.liucy.libcommon.utils.Utils;
 
 import io.objectbox.android.AndroidObjectBrowser;
 import io.objectbox.exception.DbExceptionListener;

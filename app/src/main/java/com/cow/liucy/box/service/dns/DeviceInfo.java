@@ -1,6 +1,6 @@
 package com.cow.liucy.box.service.dns;
 
-import com.cow.liucy.hdxm.libcommon.db.objectbox.CameraInfoEntity;
+import com.cow.liucy.libcommon.db.objectbox.CameraInfoEntity;
 
 import java.io.Serializable;
 import java.util.List;

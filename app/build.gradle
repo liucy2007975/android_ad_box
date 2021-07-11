@@ -177,7 +177,6 @@ dependencies {
     androidTestImplementation "com.android.support.test:runner:$rootProject.ext.runnerVersion"
     androidTestImplementation "com.android.support.test.espresso:espresso-core:$rootProject.ext.espressoVersion"
     implementation project(path: ':libcommon')
-    implementation project(path: ':module_huoyan')
     implementation project(path: ':AndroidAsync')
 
 
