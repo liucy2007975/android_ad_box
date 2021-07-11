@@ -12,28 +12,28 @@
 <!--        android:layout_height="match_parent"/>-->
 
 
-    <SeekBar
-        android:id="@+id/seedBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="-20dp"
-        android:layout_marginEnd="-20dp"
-        android:paddingStart="28dp"
-        android:paddingEnd="28dp"
-        android:gravity="center"
-        android:layout_weight="1"
-        android:splitTrack="false"
-        android:maxHeight="2dp"
-        android:visibility="invisible"
-        android:layout_alignParentBottom="true"
-        />
+<!--    <SeekBar-->
+<!--        android:id="@+id/seedBar"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginStart="-20dp"-->
+<!--        android:layout_marginEnd="-20dp"-->
+<!--        android:paddingStart="28dp"-->
+<!--        android:paddingEnd="28dp"-->
+<!--        android:gravity="center"-->
+<!--        android:layout_weight="1"-->
+<!--        android:splitTrack="false"-->
+<!--        android:maxHeight="2dp"-->
+<!--        android:visibility="invisible"-->
+<!--        android:layout_alignParentBottom="true"-->
+<!--        />-->
 
-    <ProgressBar android:id="@+id/progress_bar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
+<!--    <ProgressBar android:id="@+id/progress_bar"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_centerInParent="true"-->
 
-        />
+<!--        />-->
 
 </RelativeLayout>
 

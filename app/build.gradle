@@ -1,6 +1,6 @@
 apply plugin: 'com.android.application'
 
-def APP_ID = "com.ajb.smartparking"
+def APP_ID = "com.cow.liucy.adBox"
 def releaseTime() {
     return new Date().format("yyyy-MM-dd", TimeZone.getTimeZone("UTC"))
 }
