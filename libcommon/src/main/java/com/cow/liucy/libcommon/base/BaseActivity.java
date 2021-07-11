@@ -43,7 +43,7 @@ public class BaseActivity extends RxAppCompatActivity {
 //        daoSession= DaoManager.getInstance().getmDaoSession();
 
         //隐藏顶部，全屏显示
-//        getSupportActionBar().hide();
+        getSupportActionBar().hide();
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         //保持屏幕常量

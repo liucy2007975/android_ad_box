@@ -23,7 +23,6 @@ public class Constants {
     public static final String BANNER_PATH = APP_DEF_PATH + "banner/";
     public static final String STANDBY_AD_PATH = APP_DEF_PATH + "standby/";
     public static final String INSTALL_APK_PATH = APP_DEF_PATH + "app/";
-    public static final String RECORD_PATH = APP_DEF_PATH + "record/";
     public static final String SYNC_PATH = APP_DEF_PATH + "sync/";
     public static final String USB_PATH = "/mnt/usb_storage/USB_DISK2/udisk0/ad_box/";
 
