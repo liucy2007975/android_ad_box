@@ -1,6 +1,6 @@
 package com.cow.liucy.libcommon.utils;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import java.sql.Timestamp;
 import java.text.DateFormat;

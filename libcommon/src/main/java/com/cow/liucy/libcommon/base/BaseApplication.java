@@ -3,7 +3,7 @@ package com.cow.liucy.libcommon.base;
 import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
-import android.support.annotation.CallSuper;
+import androidx.annotation.CallSuper;
 import android.util.Log;
 
 import com.cow.liucy.libcommon.logger.AppLogger;

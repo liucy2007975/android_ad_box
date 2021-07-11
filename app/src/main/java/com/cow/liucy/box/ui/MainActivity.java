@@ -7,27 +7,25 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Message;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import android.view.KeyEvent;
-import android.view.Window;
 import android.view.WindowManager;
-import android.widget.ProgressBar;
-import android.widget.SeekBar;
 
 import com.blankj.utilcode.util.FileUtils;
-import com.blankj.utilcode.util.ShellUtils;
-import com.cow.liucy.box.service.RebootEvent;
 import com.cow.liucy.box.service.UdiskEvent;
 import com.cow.liucy.face.R;
 import com.cow.liucy.libcommon.base.BaseActivity;
 import com.cow.liucy.libcommon.logger.AppLogger;
 import com.cow.liucy.libcommon.usbmonitor.Constant;
 import com.cow.liucy.libcommon.utils.Constants;
+import com.google.android.exoplayer2.ui.PlayerView;
+import com.google.android.exoplayer2.ui.StyledPlayerView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -49,6 +47,8 @@ public class MainActivity extends BaseActivity {
     public static final int KEYCODE_NEXT = 22;
     public static final int KEYCODE_PAUSE = 23;
 
+    private PlayerView playerView=null;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -58,6 +58,8 @@ public class MainActivity extends BaseActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
+
+        playerView = findViewById(R.id.player_view);
 
 
 

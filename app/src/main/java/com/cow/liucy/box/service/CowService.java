@@ -1,6 +1,5 @@
 package com.cow.liucy.box.service;
 
-import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -8,11 +7,9 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.os.Environment;
 import android.os.IBinder;
-import android.os.SystemClock;
 import android.provider.Settings;
-import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
-import android.util.Base64;
+import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
 
 import com.cow.liucy.box.service.dns.CowDSNDto;
 import com.cow.liucy.box.service.dns.DeviceInfo;
@@ -22,9 +19,6 @@ import com.cow.liucy.face.R;
 import com.cow.liucy.libcommon.api.CommonConfig;
 import com.cow.liucy.libcommon.api.http.RetrofitManager;
 import com.cow.liucy.libcommon.api.http.model.BaseResponse;
-import com.cow.liucy.libcommon.api.http.model.DeviceLoginRes;
-import com.cow.liucy.libcommon.api.http.model.HeartBeatReq;
-import com.cow.liucy.libcommon.api.http.model.HeartBeatResp;
 
 import com.cow.liucy.libcommon.logger.AppLogger;
 
@@ -46,7 +40,6 @@ import com.jaredrummler.android.shell.Shell;
 
 import com.koushikdutta.async.AsyncNetworkSocket;
 import com.koushikdutta.async.http.AsyncHttpClient;
-import com.koushikdutta.async.http.AsyncHttpGet;
 import com.koushikdutta.async.http.AsyncHttpPost;
 import com.koushikdutta.async.http.AsyncHttpResponse;
 import com.koushikdutta.async.http.Multimap;
@@ -92,8 +85,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import retrofit2.Call;
-import retrofit2.Response;
 
 
 /**

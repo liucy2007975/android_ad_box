@@ -65,13 +65,13 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name="com.cow.liucy.libcommon.usbmonitor.USBdiskReceiver">
-            <intent-filter>
-                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
-                <action android:name="android.hardware.usb.action.USB_DEVICE_DETACHED" />
-                <action android:name="android.os.storage.action.VOLUME_STATE_CHANGED" />
-            </intent-filter>
-        </receiver>
+<!--        <receiver android:name="com.cow.liucy.libcommon.usbmonitor.USBdiskReceiver">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />-->
+<!--                <action android:name="android.hardware.usb.action.USB_DEVICE_DETACHED" />-->
+<!--                <action android:name="android.os.storage.action.VOLUME_STATE_CHANGED" />-->
+<!--            </intent-filter>-->
+<!--        </receiver>-->
         <receiver android:name="com.cow.liucy.libcommon.usbmonitor.USBdiskReceiver51">
             <intent-filter android:priority="1000">
                 <action android:name="android.intent.action.MEDIA_MOUNTED" />

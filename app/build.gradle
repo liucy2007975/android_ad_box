@@ -14,7 +14,7 @@ android {
         targetSdkVersion rootProject.ext.targetSdk
         versionCode rootProject.ext.vCode
         versionName rootProject.ext.vName
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         externalNativeBuild {
             cmake {
                 cppFlags ""
@@ -157,18 +157,18 @@ dependencies {
 //    implementation(name: 'ThermalSDK2', ext: 'aar')
 //    implementation(name: 'ThermalSDK3', ext: 'aar')
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation "com.android.support:appcompat-v7:${rootProject.ext.support}"
-    implementation "com.android.support:recyclerview-v7:${rootProject.ext.support}"
-    implementation "com.android.support:cardview-v7:${rootProject.ext.support}"
-    implementation "com.android.support:percent:${rootProject.ext.support}"
+    implementation 'androidx.appcompat:appcompat:1.0.0'
+    implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'androidx.percentlayout:percentlayout:1.0.0'
 
     //Android Shell
     api 'com.jaredrummler:android-shell:1.0.0'
     //    implementation"org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
-    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     testImplementation "junit:junit:$rootProject.ext.junitVersion"
-    androidTestImplementation "com.android.support.test:runner:$rootProject.ext.runnerVersion"
-    androidTestImplementation "com.android.support.test.espresso:espresso-core:$rootProject.ext.espressoVersion"
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
     implementation project(path: ':libcommon')
     implementation project(path: ':AndroidAsync')
 
@@ -276,7 +276,7 @@ dependencies {
     implementation project(':apache-ftpserver-1.1.1:ftplet-api')
     implementation 'commons-io:commons-io:2.6'
 
-//    implementation 'com.google.android.exoplayer:exoplayer-core:2.10.5'
-//    implementation 'com.google.android.exoplayer:exoplayer-ui:2.10.5'
+    implementation 'com.google.android.exoplayer:exoplayer-core:2.14.1'
+    implementation 'com.google.android.exoplayer:exoplayer-ui:2.14.1'
 }
 apply plugin: 'io.objectbox'

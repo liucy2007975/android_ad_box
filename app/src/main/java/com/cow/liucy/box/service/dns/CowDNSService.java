@@ -9,21 +9,16 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.IBinder;
-import android.os.SystemClock;
 import android.provider.Settings;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.cow.liucy.box.service.CowService;
 import com.cow.liucy.face.BuildConfig;
 import com.cow.liucy.libcommon.api.http.RetrofitManager;
-import com.cow.liucy.libcommon.api.http.model.BaseResponse;
-import com.cow.liucy.libcommon.api.http.model.DeviceLoginRes;
 import com.cow.liucy.libcommon.logger.AppLogger;
 
 import com.cow.liucy.libcommon.utils.AppPrefs;
 import com.cow.liucy.libcommon.utils.CommonUtils;
-import com.cow.liucy.libcommon.utils.Constants;
-import com.cow.liucy.libcommon.utils.FileUtils;
 import com.cow.liucy.libcommon.utils.NetUtil;
 import com.cow.liucy.libcommon.utils.ToastUtils;
 import com.cow.liucy.libcommon.utils.Utils;
@@ -48,8 +43,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import retrofit2.Call;
-import retrofit2.Response;
 
 
 /**

@@ -3,8 +3,8 @@ package com.cow.liucy.libcommon.utils;
 import android.content.Context;
 import android.net.LinkAddress;
 import android.net.ProxyInfo;
-import android.support.v4.view.MotionEventCompat;
-import android.support.v4.view.ViewCompat;
+import androidx.core.view.MotionEventCompat;
+import androidx.core.view.ViewCompat;
 import android.util.Log;
 
 
