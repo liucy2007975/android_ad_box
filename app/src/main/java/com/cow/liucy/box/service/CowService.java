@@ -225,18 +225,18 @@ public class CowService extends Service implements HttpServerRequestCallback {
 
         @Override
         public void onDirectoryCreate(File directory) {
-//                AppLogger.e(">>>>>>>onDirectoryCreate:"+directory.getPath());
+                AppLogger.e(">>>>>>>onDirectoryCreate:"+directory.getPath());
         }
 
         @Override
         public void onDirectoryChange(File directory) {
-//            AppLogger.e(">>>>>>>onDirectoryChange:"+directory.getPath());
+            AppLogger.e(">>>>>>>onDirectoryChange:"+directory.getPath());
 
         }
 
         @Override
         public void onDirectoryDelete(File directory) {
-//            AppLogger.e(">>>>>>>onDirectoryDelete:"+directory.getPath());
+            AppLogger.e(">>>>>>>onDirectoryDelete:"+directory.getPath());
 
         }
 
@@ -259,12 +259,12 @@ public class CowService extends Service implements HttpServerRequestCallback {
 
         @Override
         public void onFileChange(File file) {
-//            AppLogger.e(">>>>>>>onFileChange:"+file.getPath());
+            AppLogger.e(">>>>>>>onFileChange:"+file.getPath());
         }
 
         @Override
         public void onFileDelete(File file) {
-//            AppLogger.e(">>>>>>>onFileDelete:"+file.getPath());
+            AppLogger.e(">>>>>>>onFileDelete:"+file.getPath());
         }
 
         @Override
