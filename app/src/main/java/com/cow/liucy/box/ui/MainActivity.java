@@ -40,6 +40,8 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.io.File;
+
 
 public class MainActivity extends BaseActivity {
 
@@ -73,12 +75,15 @@ public class MainActivity extends BaseActivity {
         playerView.setPlayer(player);
 
 
-        // 创建mediaItem
-        MediaItem firstItem = MediaItem.fromUri("file:///sdcard/ad_box/video/001.mp4");
-        MediaItem secondItem =  MediaItem.fromUri("file:///sdcard/ad_box/video/002.mp4");
-        // 添加要播放的媒体项目。
-        player.addMediaItem(firstItem);
-        player.addMediaItem(secondItem);
+        File videoPath=new File(Constants.VIDEO_PATH);
+        for (File file : videoPath.listFiles()){
+            Uri uri = null;
+            if(file.exists()) {
+                uri = Uri.fromFile(file);
+                MediaItem item = MediaItem.fromUri(uri);
+                player.addMediaItem(item);
+            }
+        }
         //  准备播放
         player.prepare();
         // 开始播放
