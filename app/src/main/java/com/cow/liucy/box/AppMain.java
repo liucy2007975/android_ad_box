@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.cow.liucy.box.service.CowService;
-import com.cow.liucy.box.service.dns.CowDNSService;
 import com.cow.liucy.face.BuildConfig;
 
 import com.cow.liucy.libcommon.base.BaseApplication;
@@ -27,8 +26,6 @@ import io.reactivex.plugins.RxJavaPlugins;
  */
 
 public class AppMain extends BaseApplication {
-
-//    http://sg-gateway.dev1.dyajb.com/
 
     @Override
     public void onCreate() {
@@ -87,7 +84,7 @@ public class AppMain extends BaseApplication {
 //        }
         //启动服务
         startService(new Intent(Utils.getContext(), CowService.class));
-        startService(new Intent(Utils.getContext(), CowDNSService.class));
+//        startService(new Intent(Utils.getContext(), CowDNSService.class));
 
 
     }

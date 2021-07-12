@@ -95,10 +95,6 @@
             android:name="com.cow.liucy.box.service.CowService"
             android:enabled="true"
             android:exported="true"></service>
-        <service
-            android:name="com.cow.liucy.box.service.dns.CowDNSService"
-            android:enabled="true"
-            android:exported="true"></service>
 
 
     </application>
