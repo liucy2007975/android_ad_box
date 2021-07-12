@@ -19,9 +19,9 @@ public class BootReceiver extends BroadcastReceiver {
 
         AppLogger.e(" BootReceiver 接收到开机启动的广播 ------------------>>>.");
         if (intent.getAction().equals(BOOT_COMPLETED)) {
-            Intent fileIntent = new Intent(Utils.getContext(), MainActivity.class);
-            fileIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            Utils.getContext().startActivity(fileIntent);
+//            Intent fileIntent = new Intent(Utils.getContext(), MainActivity.class);
+//            fileIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//            Utils.getContext().startActivity(fileIntent);
             AppLogger.e(" BootReceiver  打开MainActivity--------------->>>.");
         }
     }

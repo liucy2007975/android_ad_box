@@ -25,7 +25,9 @@ import com.cow.liucy.face.R;
 import com.cow.liucy.libcommon.base.BaseActivity;
 import com.cow.liucy.libcommon.logger.AppLogger;
 import com.cow.liucy.libcommon.usbmonitor.Constant;
+import com.cow.liucy.libcommon.usbmonitor.Util;
 import com.cow.liucy.libcommon.utils.Constants;
+import com.cow.liucy.libcommon.utils.Utils;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.SimpleExoPlayer;
@@ -94,7 +96,11 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        EventBus.getDefault().register(this);
+        if (!EventBus.getDefault().isRegistered(this))
+        {
+            EventBus.getDefault().register(this);
+        }
+
     }
 
     @Override

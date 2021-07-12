@@ -58,6 +58,7 @@
         >
         <!--二维码测试-->
         <activity android:name="com.cow.liucy.box.ui.MainActivity"
+            android:launchMode="singleInstance"
              >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
