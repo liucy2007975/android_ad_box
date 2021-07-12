@@ -31,7 +31,12 @@ import com.cow.liucy.libcommon.rxnetty.CommandVo;
 import com.cow.liucy.libcommon.usbmonitor.Constant;
 import com.cow.liucy.libcommon.utils.Constants;
 import com.google.android.exoplayer2.MediaItem;
+import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.audio.AudioListener;
+import com.google.android.exoplayer2.source.LoopingMediaSource;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.text.Cue;
 import com.google.android.exoplayer2.ui.PlayerView;
 
 import org.greenrobot.eventbus.EventBus;
@@ -39,6 +44,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
+import java.util.List;
 
 
 public class MainActivity extends BaseActivity {
@@ -61,6 +67,7 @@ public class MainActivity extends BaseActivity {
     private SimpleExoPlayer videoPlayer=null;
     private SimpleExoPlayer audioPlayer=null;
     AudioManager audiomanager;//音频管理器
+    private CommandVo commandVo=null;//当前播放指令
 
 
 
@@ -80,7 +87,22 @@ public class MainActivity extends BaseActivity {
         videoPlayer = new SimpleExoPlayer.Builder(this)
                 .build();
         audioPlayer = new SimpleExoPlayer.Builder(this)
-                .build();;
+                .build();
+
+        audioPlayer.addListener(new Player.Listener() {
+            @Override
+            public void onPlaybackStateChanged(int state) {
+                AppLogger.e(">>>>audioPlayer>onPlaybackStateChanged:"+state);
+            }
+        });
+
+        videoPlayer.addListener(new Player.Listener() {
+            @Override
+            public void onPlaybackStateChanged(int state) {
+                AppLogger.e(">>>>videoPlayer>onPlaybackStateChanged:"+state);
+
+            }
+        });
 
         videoPlayerView.setPlayer(videoPlayer);
 
@@ -103,8 +125,6 @@ public class MainActivity extends BaseActivity {
                 videoPlayer.addMediaItem(item);
             }
         }
-
-
 
         videoPlayer.setVolume(0f);//静音
         //  准备播放
@@ -245,7 +265,105 @@ public class MainActivity extends BaseActivity {
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onCommandEvent(CommandVo commandVo) {
         AppLogger.e(">>>>>onCommandEvent:"+ JSON.toJSONString(commandVo));
+        this.commandVo=commandVo;
 
+        if (!commandVo.getVideoNo().equals("000")){
+            //播放指定视频逻辑
+            File file=new File(Constants.VIDEO_PATH+commandVo.getVideoNo()+".mp4");
+            if (file.exists()){
+
+                int videoNo=Integer.parseInt(commandVo.getVideoNo());
+
+                if (videoNo<=100) {
+                    videoPlayer.setVolume(0f);//视频静音，100序号以下，视频静音
+                }else{
+                    videoPlayer.setVolume(1f);//视频取消静音
+                }
+
+
+                Uri uri = Uri.fromFile(file);
+                MediaItem item = MediaItem.fromUri(uri);
+                //清除MediaItems
+                videoPlayer.clearMediaItems();
+                //播放指定音频逻辑
+                if (commandVo.getVideoNo().equals("03")){
+                    //按循环次数播放 指定音频
+                    int count= Integer.parseInt(commandVo.getVideoCirc());//循环次数
+                    videoPlayer.setRepeatMode(Player.REPEAT_MODE_OFF);
+
+                }else if (commandVo.getVideoNo().equals("01")){
+                    videoPlayer.setRepeatMode(Player.REPEAT_MODE_OFF);
+                    //只播放一次 指定音频
+                    videoPlayer.addMediaItem(item);
+
+                }else if (commandVo.getVideoNo().equals("02")){
+                    //循环播放 指定音频
+                    //只播放一次 指定音频
+                    videoPlayer.addMediaItem(item);
+                    videoPlayer.setRepeatMode(Player.REPEAT_MODE_ONE);
+                }
+
+                //  准备播放
+                videoPlayer.prepare();
+                // 开始播放
+                videoPlayer.play();
+            }else{
+                AppLogger.e(">>>>需要播放的视频文件不存在！");
+            }
+
+        }else{//停止视频
+            if (videoPlayer!=null){
+                videoPlayer.stop();
+            }
+        }
+
+        if(!commandVo.getAudioNo().equals("000")){//需要播放音频
+
+            File file=new File(Constants.AUDIO_PATH+commandVo.getAudioNo()+".mp3");
+            if (file.exists()){
+
+                videoPlayer.setVolume(0f);//视频静音
+
+                Uri uri = Uri.fromFile(file);
+                MediaItem item = MediaItem.fromUri(uri);
+
+                //清除MediaItems
+                audioPlayer.clearMediaItems();
+
+                //播放指定音频逻辑
+                if (commandVo.getAudioMod().equals("03")){
+                    //按循环次数播放 指定音频
+                   int count= Integer.parseInt(commandVo.getAudioCirc());//循环次数
+                   audioPlayer.setRepeatMode(Player.REPEAT_MODE_OFF);
+
+
+                }else if (commandVo.getAudioMod().equals("01")){
+                    audioPlayer.setRepeatMode(Player.REPEAT_MODE_OFF);
+                    //只播放一次 指定音频
+                    audioPlayer.addMediaItem(item);
+
+                }else if (commandVo.getAudioMod().equals("02")){
+                    //循环播放 指定音频
+                    //只播放一次 指定音频
+                    audioPlayer.addMediaItem(item);
+                    audioPlayer.setRepeatMode(Player.REPEAT_MODE_ONE);
+                }
+                //  准备播放
+                audioPlayer.prepare();
+                // 开始播放
+                audioPlayer.play();
+
+            }else{
+                AppLogger.e(">>>>需要播放的音频文件不存在！");
+            }
+
+        }else{//停止音频
+            videoPlayer.setVolume(1f);//视频取消静音
+
+            if (audioPlayer!=null){
+                audioPlayer.stop();
+            }
+        }
     }
 
     @Override
