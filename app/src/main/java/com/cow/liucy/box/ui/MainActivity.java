@@ -118,7 +118,7 @@ public class MainActivity extends BaseActivity {
 
         AppLogger.e(">>>>最大音量："+audiomanager.getStreamMaxVolume(AudioManager.STREAM_MUSIC));//最大值： 100
 
-        audiomanager.setStreamVolume(AudioManager.STREAM_MUSIC, 30, AudioManager.FLAG_SHOW_UI);
+        audiomanager.setStreamVolume(AudioManager.STREAM_MUSIC, 17, AudioManager.FLAG_SHOW_UI);
 
         //  准备播放
         audioPlayer.prepare();

@@ -31,7 +31,7 @@ import com.cow.liucy.libcommon.utils.NetUtil;
 import com.cow.liucy.libcommon.utils.ToastUtils;
 import com.cow.liucy.libcommon.utils.Valid;
 
-import com.cow.liucy.libcommon.huoyan.rxnetty.VzenithNettyManager;
+import com.cow.liucy.libcommon.rxnetty.CowNettyManager;
 
 import com.alibaba.fastjson.JSON;
 import com.blankj.utilcode.util.ShellUtils;
@@ -72,10 +72,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import cn.hutool.core.io.FileUtil;
@@ -93,10 +91,8 @@ import io.reactivex.schedulers.Schedulers;
 
 public class CowService extends Service implements HttpServerRequestCallback {
 
-    /**
-     * 火眼SDK列表 IP《=》SDK
-     */
-    private Map<String,VzenithNettyManager> vzenithNettyManagerMap=new HashMap<>();
+
+    private CowNettyManager cowNettyManager;
 
     private CompositeDisposable compositeDisposable;
     private     volatile boolean isFinish = false;
@@ -295,7 +291,9 @@ public class CowService extends Service implements HttpServerRequestCallback {
         if (Valid.valid(localIp)){
             AppLogger.e(">>>>localIp:"+localIp);
             this.server = new AsyncHttpServer();
-//            initVzenithNettyManager();
+
+            cowNettyManager =new CowNettyManager("192.168.8.3",9990);
+            cowNettyManager.start();
 
             stopHttpServer();
             initHttpServer();
@@ -480,17 +478,7 @@ public class CowService extends Service implements HttpServerRequestCallback {
     }
 
 
-    private  void clear(){
 
-        if (Valid.valid(vzenithNettyManagerMap)){
-            for (String ip: vzenithNettyManagerMap.keySet()){
-                vzenithNettyManagerMap.get(ip).stop();
-            }
-            vzenithNettyManagerMap.clear();
-        }
-
-        ipList.clear();
-    }
 
 
     @Override
@@ -500,7 +488,7 @@ public class CowService extends Service implements HttpServerRequestCallback {
         EventBus.getDefault().unregister(this);
         if (compositeDisposable != null)
             compositeDisposable.clear();
-        clear();
+
         stopFTPServer();
     }
 
