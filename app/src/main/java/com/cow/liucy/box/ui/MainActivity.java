@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -31,6 +32,7 @@ import com.cow.liucy.libcommon.utils.Utils;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.audio.AudioListener;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.PlayerView;
@@ -61,6 +63,7 @@ public class MainActivity extends BaseActivity {
     public static final int KEYCODE_PAUSE = 23;
 
     private PlayerView playerView=null;
+    AudioManager audiomanager;//音频管理器
 
 
     @Override
@@ -71,10 +74,27 @@ public class MainActivity extends BaseActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
+        //获取音频管理器服务
+        audiomanager=(AudioManager) getSystemService(Context.AUDIO_SERVICE);
+
         playerView = findViewById(R.id.player_view);
-        SimpleExoPlayer player = new SimpleExoPlayer.Builder(this).build();
+
+        SimpleExoPlayer player = new SimpleExoPlayer.Builder(this)
+                .build();
+        SimpleExoPlayer audioPlayer = new SimpleExoPlayer.Builder(this)
+                .build();;
+
         playerView.setPlayer(player);
 
+        File audioPath=new File(Constants.AUDIO_PATH);
+        for (File file : audioPath.listFiles()){
+            Uri uri = null;
+            if(file.exists()) {
+                uri = Uri.fromFile(file);
+                MediaItem item = MediaItem.fromUri(uri);
+                audioPlayer.addMediaItem(item);
+            }
+        }
 
         File videoPath=new File(Constants.VIDEO_PATH);
         for (File file : videoPath.listFiles()){
@@ -85,10 +105,25 @@ public class MainActivity extends BaseActivity {
                 player.addMediaItem(item);
             }
         }
+
+        player.getAudioSessionId();
+
+
+        player.setVolume(0f);//静音
         //  准备播放
         player.prepare();
         // 开始播放
         player.play();
+
+
+        AppLogger.e(">>>>最大音量："+audiomanager.getStreamMaxVolume(AudioManager.STREAM_MUSIC));//最大值： 100
+
+        audiomanager.setStreamVolume(AudioManager.STREAM_MUSIC, 30, AudioManager.FLAG_SHOW_UI);
+
+        //  准备播放
+        audioPlayer.prepare();
+        // 开始播放
+        audioPlayer.play();
     }
 
     @Override

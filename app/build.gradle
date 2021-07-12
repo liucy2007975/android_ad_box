@@ -276,7 +276,13 @@ dependencies {
     implementation project(':apache-ftpserver-1.1.1:ftplet-api')
     implementation 'commons-io:commons-io:2.6'
 
-    implementation 'com.google.android.exoplayer:exoplayer-core:2.14.1'
-    implementation 'com.google.android.exoplayer:exoplayer-ui:2.14.1'
+//    implementation 'com.google.android.exoplayer:exoplayer-core:2.14.1'
+//    implementation 'com.google.android.exoplayer:exoplayer-ui:2.14.1'
+
+//    implementation 'com.github.CarGuo.GSYVideoPlayer:gsyVideoPlayer-java:v8.1.5-jitpack'
+//    //是否需要ExoPlayer模式
+    implementation 'com.github.CarGuo.GSYVideoPlayer:gsyVideoPlayer-exo_player2:v8.1.5-jitpack'
+
+    implementation 'com.github.CarGuo.GSYVideoPlayer:gsyVideoPlayer:v8.1.5-jitpack'
 }
 apply plugin: 'io.objectbox'
