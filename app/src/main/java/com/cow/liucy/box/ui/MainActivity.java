@@ -71,7 +71,6 @@ public class MainActivity extends BaseActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
-
         playerView = findViewById(R.id.player_view);
         SimpleExoPlayer player = new SimpleExoPlayer.Builder(this).build();
         playerView.setPlayer(player);
@@ -90,7 +89,6 @@ public class MainActivity extends BaseActivity {
         player.prepare();
         // 开始播放
         player.play();
-
     }
 
     @Override
@@ -108,6 +106,8 @@ public class MainActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
         AppLogger.e(">>>>>>onResume");
+        playerView.getPlayer().prepare();
+        playerView.getPlayer().play();
         playerView.onResume();
         localBroadcastManager = LocalBroadcastManager.getInstance(this);
         intentFilter = new IntentFilter();
@@ -209,8 +209,19 @@ public class MainActivity extends BaseActivity {
     protected void onPause() {
         super.onPause();
         AppLogger.e(">>>>>>onPause");
+        playerView.getPlayer().pause();
         playerView.onPause();
         localBroadcastManager.unregisterReceiver(localReceiver);
+    }
+
+    /**
+     * 重写finish()方法
+     */
+    @Override
+    public void finish() {
+        //super.finish(); //记住不要执行此句
+        AppLogger.e(">>>>>>finish");
+        moveTaskToBack(true); //设置该activity永不过期，即不执行onDestroy()
     }
 
     @Override
@@ -223,6 +234,7 @@ public class MainActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         AppLogger.e(">>>>>>onDestroy");
+        playerView.getPlayer().release();
         EventBus.getDefault().unregister(this);
     }
 
