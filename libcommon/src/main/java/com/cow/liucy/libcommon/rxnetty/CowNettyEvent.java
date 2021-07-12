@@ -7,9 +7,8 @@ package com.cow.liucy.libcommon.rxnetty;
  */
 
 public interface CowNettyEvent {
-//    public void venithOnLine();
-//    public void venithOffLine();
-    public void venithOnReciveData(String deviceIp);
+
+    public void cowOnReciveData(String msg);
 
 
 }

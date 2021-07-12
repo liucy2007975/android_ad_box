@@ -22,6 +22,8 @@ import com.cow.liucy.libcommon.api.http.model.BaseResponse;
 
 import com.cow.liucy.libcommon.logger.AppLogger;
 
+import com.cow.liucy.libcommon.rxnetty.CommandVo;
+import com.cow.liucy.libcommon.rxnetty.CowNettyEvent;
 import com.cow.liucy.libcommon.utils.AppPrefs;
 import com.cow.liucy.libcommon.utils.CommonUtils;
 import com.cow.liucy.libcommon.utils.Constants;
@@ -292,7 +294,30 @@ public class CowService extends Service implements HttpServerRequestCallback {
             AppLogger.e(">>>>localIp:"+localIp);
             this.server = new AsyncHttpServer();
 
+            if (cowNettyManager!=null){
+                cowNettyManager.stop();
+                cowNettyManager=null;
+            }
             cowNettyManager =new CowNettyManager("192.168.8.3",9990);
+            cowNettyManager.setNettyEvent(new CowNettyEvent() {
+                @Override
+                public void cowOnReciveData(String msg) {
+                    String[] allCommand=msg.split(";");
+                    if (allCommand.length!=8){
+                        AppLogger.e(">>>>服务器数据格式有误");
+                    }else {
+                        CommandVo commandVo=new CommandVo();
+                        commandVo.setVideoNo(allCommand[0].substring(allCommand[0].indexOf("=")+1));
+                        commandVo.setVideoMod(allCommand[1].substring(allCommand[1].indexOf("=")+1));
+                        commandVo.setVideoCirc(allCommand[2].substring(allCommand[2].indexOf("=")+1));
+                        commandVo.setAudioNo(allCommand[3].substring(allCommand[3].indexOf("=")+1));
+                        commandVo.setAudioMod(allCommand[4].substring(allCommand[4].indexOf("=")+1));
+                        commandVo.setAudioCirc(allCommand[5].substring(allCommand[5].indexOf("=")+1));
+//                        AppLogger.e(">>>>commandVo:"+JSON.toJSONString(commandVo));
+                        EventBus.getDefault().post(commandVo);
+                    }
+                }
+            });
             cowNettyManager.start();
 
             stopHttpServer();
@@ -300,33 +325,6 @@ public class CowService extends Service implements HttpServerRequestCallback {
             startHttpServer();
             stopFTPServer();
             startFTPServer();
-//
-//            Flowable.just(0)
-//                    .observeOn(Schedulers.io())
-//                    .subscribe(l->{
-//                        try {
-//                            //设备登陆
-//                            Call<BaseResponse<DeviceLoginRes>> deviceLogin = RetrofitManager.getInstance()
-//                                    .postDeviceLogin(AppPrefs.getInstance().getSn().toString());
-//                            Response<BaseResponse<DeviceLoginRes>> responseBody = deviceLogin.execute();
-//                            if (Valid.valid(responseBody) && Valid.valid(responseBody.body())){
-//                                if (responseBody.body().code==200){
-//                                    DeviceLoginRes deviceLoginRes=responseBody.body().data;
-//                                    if (Valid.valid(deviceLoginRes)){
-//                                        AppPrefs.getInstance().setParkingId(deviceLoginRes.getParkingLotId()+"");
-//                                        AppPrefs.getInstance().setTerminalId(deviceLoginRes.getDeviceId()+"");
-//                                        //设置系统时间
-//                                        SystemClock.setCurrentTimeMillis(deviceLoginRes.getTime());    //需要系统权限
-//                                    }
-//                                    AppLogger.e(">>>>>>>deviceLogin:"+JSON.toJSONString(deviceLoginRes));
-//                                }
-//                            }
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
-//                    },e->{
-//                        e.printStackTrace();
-//                    });
             cancelReconnect();
         }else{
             AppLogger.e(">>>>设备还未配置IP地址");
@@ -362,76 +360,6 @@ public class CowService extends Service implements HttpServerRequestCallback {
     public int onStartCommand(Intent intent, int flags, int startId) {
         AppLogger.e(">>>>>>cowHttpService onStartCommand>>>>:");
         showNotification();
-
-//        //HTTP心跳时间同步定时任务
-//        Flowable.interval(5, 60*5, TimeUnit.SECONDS)
-//                .subscribe(l -> {
-//                    if (Valid.valid(AppPrefs.getInstance().getTerminalId())) {
-//                        HeartBeatReq heartBeatReq=new HeartBeatReq();
-//                        heartBeatReq.setDeviceId(Long.parseLong(AppPrefs.getInstance().getTerminalId()));
-//                        heartBeatReq.setLastUpdateTime(DateTimeUtils.getFormatedDataString());
-//                        heartBeatReq.setVersion(BuildConfig.VERSION_NAME + "-" + BuildConfig.VERSION_CODE);
-//                        RetrofitManager.getInstance().postDeviceHeartbeatV2(heartBeatReq)
-//                                .subscribe(response->{
-//                                    if (response!=null && response.code==200){
-//                                            HeartBeatResp heartBeatResp=response.data;
-//                                            if (heartBeatResp!=null && heartBeatResp.getType()==1){
-//                                                    if (Valid.valid(heartBeatResp.getDownloadUrl()) && !heartBeatResp.getDownloadUrl().equalsIgnoreCase("null")){
-//                                                        if (updating==true){
-//                                                            return;
-//                                                        }
-//                                                        updating=true;
-//                                                        FileUtils.deleteFile("/sdcard/smartparking/update.apk");
-//                                                        AsyncHttpGet request=new AsyncHttpGet(heartBeatResp.getDownloadUrl());
-//                                                        AsyncHttpClient.getDefaultInstance().executeFile(request, "/sdcard/smartparking/update.apk", new AsyncHttpClient.FileCallback() {
-//                                                            @Override
-//                                                            public void onCompleted(Exception e, AsyncHttpResponse response, File result) {
-//                                                                if (e != null) {
-//                                                                    e.printStackTrace();
-//                                                                    return;
-//                                                                }
-//                                                                AppLogger.e("my file is available at: " + result.getPath());
-//                                                                execCommand("pm", "install", "-r", result.getPath());
-//                                                            }
-//                                                        });
-//                                                    }
-//                                            }
-//                                    }else{
-//                                        AppLogger.e(">>>>心跳失败，code:"+response.code);
-//                                    }
-//                                },e->{
-//                                    AppLogger.e(">>>>心跳失败");
-//                                    e.printStackTrace();
-//                                });
-//
-//                    }else{
-//                        AppLogger.e(">>>设备暂未初始化>>>即将进行设备登陆>>");
-//                        try {
-//                            //设备登陆
-//                            Call<BaseResponse<DeviceLoginRes>> deviceLogin = RetrofitManager.getInstance()
-//                                    .postDeviceLogin(AppPrefs.getInstance().getSn().toString());
-//                            Response<BaseResponse<DeviceLoginRes>> responseBody = deviceLogin.execute();
-//                            if (Valid.valid(responseBody) && Valid.valid(responseBody.body())){
-//                                if (responseBody.body().code==200){
-//                                    DeviceLoginRes deviceLoginRes=responseBody.body().data;
-//                                    if (Valid.valid(deviceLoginRes)){
-//                                        AppPrefs.getInstance().setParkingId(deviceLoginRes.getParkingLotId()+"");
-//                                        AppPrefs.getInstance().setTerminalId(deviceLoginRes.getDeviceId()+"");
-//                                        //设置系统时间
-//                                        SystemClock.setCurrentTimeMillis(deviceLoginRes.getTime());    //需要系统权限
-//                                    }
-//                                    AppLogger.e(">>>>>>>deviceLogin:"+JSON.toJSONString(deviceLoginRes));
-//                                }
-//                            }
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
-//                }, e -> {
-//                    AppLogger.e(">>>e:" + e.getMessage());
-//                });
-
-
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -485,6 +413,10 @@ public class CowService extends Service implements HttpServerRequestCallback {
     public void onDestroy() {
         isFinish = true;
         super.onDestroy();
+        if (cowNettyManager!=null){
+            cowNettyManager.stop();
+            cowNettyManager=null;
+        }
         EventBus.getDefault().unregister(this);
         if (compositeDisposable != null)
             compositeDisposable.clear();

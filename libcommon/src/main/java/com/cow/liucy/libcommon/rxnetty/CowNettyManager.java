@@ -3,7 +3,7 @@ package com.cow.liucy.libcommon.rxnetty;
 
 
 import com.cow.liucy.libcommon.logger.AppLogger;
-
+import com.cow.liucy.libcommon.utils.ConvertUtil;
 
 
 import java.net.InetSocketAddress;
@@ -37,7 +37,7 @@ public class CowNettyManager {
     /**
      * 心跳时间间隔
      */
-    private final int KEEP_ALIVED_TIME = 25;
+    private final int KEEP_ALIVED_TIME = 30;
     /**
      * 重连时间间隔
      */
@@ -45,6 +45,7 @@ public class CowNettyManager {
     private CowNettyEvent nettyEvent;
     private Disposable mDisposableReconnect;
     private Disposable mDisposableKeepAlived;
+    private int count=100;
 
     public CowNettyManager(String serverIP, int port) {
         this.serverIP = serverIP;
@@ -52,9 +53,6 @@ public class CowNettyManager {
         AppLogger.e(">>>>serverIp:" + serverIP + ">>>port:" + port);
     }
 
-    byte[] data=null;
-    byte[] fullImage=null;
-    byte[] clipImage=null;
     public void start() {
         if (mConnection != null) {
             mConnection.closeNow();
@@ -78,7 +76,7 @@ public class CowNettyManager {
                 .channelOption(ChannelOption.TCP_NODELAY, true)
                 .channelOption(ChannelOption.AUTO_READ, true)
                 //设置读取超时时间，
-                .readTimeOut(KEEP_ALIVED_TIME * 2 + 3, TimeUnit.SECONDS)
+                .readTimeOut(KEEP_ALIVED_TIME * 10 , TimeUnit.SECONDS)
                 .createConnectionRequest()
                 .subscribeOn(rx.schedulers.Schedulers.io())
                 .subscribe(newConnection -> {
@@ -87,63 +85,17 @@ public class CowNettyManager {
                         String msg=new String(message ,Charset.forName("UTF-8"));
                         AppLogger.e(">>>>>>message:"+msg+ ">>>length:"+message.length);
                         if (msg.startsWith("{")){
-                            AppLogger.e(">>数据接收正常>>>"+msg);
+                            if (msg.contains("Reserved1=001;")){
+                                AppLogger.e(">>播放业务数据接收正常>>>"+msg);
+                                if (nettyEvent!=null) {
+                                    nettyEvent.cowOnReciveData(msg);
+                                }
+                            }else{
+                                AppLogger.e(">>心跳数据接收正常>>>"+msg);
+                            }
                         }else{
                             AppLogger.e(">>>>数据格式错误>>>"+msg);
                         }
-//                        AppLogger.e("receive : " + ConvertUtil.bytesToHexString(message));
-//                        VzenithDataPacket vzenithDataPacket = new VzenithDataPacket(message);
-////                        AppLogger.e(">>>>>getHeader:" + ConvertUtil.bytesToHexString(vzenithDataPacket.getHeader()));
-//                        if (Valid.valid(vzenithDataPacket)) {
-//                            if (vzenithDataPacket.getData()!=null && vzenithDataPacket.getData().length>0){
-//
-//                            }
-//                            if (nettyEvent != null && vzenithDataPacket.getData()!=null && vzenithDataPacket.getData().length>0) {
-//                                data=null;
-//                                data=vzenithDataPacket.getData();
-////                                AppLogger.e(">>>>>venithOnReciveData:"+ data.length);
-//
-//                                //找字符串分隔符 '/0'
-//                                int position = -1;
-//                                for (int i = 0; i < data.length; i ++) {
-//                                    if (data[i] == '\0') {
-//                                        position = i;
-//                                        break;
-//                                    }
-//                                }
-//                                String json = null;
-//                                if (position < 0) {
-//                                    json = new String(data, Charset.forName("GBK"));
-//                                } else {
-//                                    json = new String(data, 0, position, Charset.forName("GBK"));
-//                                }
-////                                AppLogger.e(">>>json:"+json);
-//
-//                                JSONObject jsonObject=JSONObject.parseObject(json);
-////                                AppLogger.e("cmd:"+jsonObject.get("cmd"));
-//                                //如何是车牌数据回调结果
-//                                if (jsonObject.get("cmd").toString().equals("ivs_result")){
-//                                    IvsResultResponse ivsResultResponse= (IvsResultResponse) JSONObject.parseObject(json,IvsResultResponse.class);
-//                                    AppLogger.e(">>>>:"+ivsResultResponse.getPlateResult().getLicense()+"  "+ivsResultResponse.getImageformat());
-//
-//                                    int fullImageLength=jsonObject.getIntValue("fullImgSize");
-//                                    int clipImageLength=jsonObject.getIntValue("clipImgSize");
-//                                    fullImage=null;
-//                                    clipImage=null;
-//                                    fullImage = new byte[fullImageLength];
-//                                    clipImage = new byte[clipImageLength];
-//                                    if (fullImageLength>0) {
-//                                        System.arraycopy(data, position + 1, fullImage, 0, fullImage.length);
-//                                    }
-//                                    if (clipImageLength>0){
-//                                        System.arraycopy(data, position + 1 + fullImage.length, clipImage, 0, clipImage.length);
-//                                    }
-//                                    //接收数据回调
-//                                    nettyEvent.venithOnReciveData(serverIP,ivsResultResponse,fullImage,clipImage);
-//                                }
-
-//                            }
-//                        }
                     }, e -> {
                         e.printStackTrace();
                         reconnect(e);
@@ -152,11 +104,6 @@ public class CowNettyManager {
                     e.printStackTrace();
                     reconnect(e);
                 }, () -> {
-                    if (nettyEvent != null) {
-//                        nettyEvent.venithOnLine();
-                        //配置车牌数据推送模式
-//                        setDataPushModel();
-                    }
                     isOnLine = true;
 
                     AppLogger.e("connect success");
@@ -185,9 +132,6 @@ public class CowNettyManager {
                     }
                     AppLogger.e("reconnect");
                     if (isOnLine) {
-                        if (nettyEvent != null) {
-//                            nettyEvent.venithOffLine();
-                        }
                     }
                     isOnLine = false;
                     start();
@@ -260,8 +204,12 @@ public class CowNettyManager {
         mDisposableKeepAlived = Flowable.interval(KEEP_ALIVED_TIME, TimeUnit.SECONDS).subscribe(aLong -> {
 //            if (isSyncData) return;
 
-//            AppLogger.e(">>>proto>>>" + "send_keepalived_message:"+ConvertUtil.bytesToHexString(vzenithDataPacket.getPacket()));
-//            send(vzenithDataPacket.getPacket());
+            if (count++>=998){
+                count=100;
+                count++;
+            }
+            String data="{Video_No=000;Video_Mod=00;Video_Circ=00;Audio_No=000;Audio_Mod=00;Audio_Circ=00;Reserved1="+(count)+";Reserved2=000}";
+            send(data.getBytes(Charset.forName("utf-8")));
         });
     }
 
