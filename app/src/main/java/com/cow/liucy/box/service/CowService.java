@@ -56,12 +56,7 @@ import com.koushikdutta.async.http.server.HttpServerRequestCallback;
 import org.apache.commons.io.monitor.FileAlterationListener;
 import org.apache.commons.io.monitor.FileAlterationMonitor;
 import org.apache.commons.io.monitor.FileAlterationObserver;
-import org.apache.ftpserver.FtpServer;
-import org.apache.ftpserver.FtpServerFactory;
-import org.apache.ftpserver.ftplet.Authority;
-import org.apache.ftpserver.listener.ListenerFactory;
-import org.apache.ftpserver.usermanager.impl.BaseUser;
-import org.apache.ftpserver.usermanager.impl.WritePermission;
+
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -108,8 +103,6 @@ public class CowService extends Service implements HttpServerRequestCallback {
     private static final String FILE="/file";
     private static final String HTTP_SET="/set";
 
-
-    private FtpServer ftpServer;
     private Disposable mDisposableRecreate;
 
     FileAlterationObserver observer=null;
@@ -300,8 +293,7 @@ public class CowService extends Service implements HttpServerRequestCallback {
             stopHttpServer();
             initHttpServer();
             startHttpServer();
-            stopFTPServer();
-            startFTPServer();
+
             cancelReconnect();
         }else{
             AppLogger.e(">>>>设备还未配置IP地址");
@@ -340,51 +332,6 @@ public class CowService extends Service implements HttpServerRequestCallback {
         return super.onStartCommand(intent, flags, startId);
     }
 
-    //启动Ftp Server
-    private void startFTPServer(){
-                        ListenerFactory factory = new ListenerFactory();
-                        factory.setPort(AppPrefs.getInstance().getFtpPort());
-//                        factory.setServerAddress("192.168.46.125");
-                        FtpServerFactory serverFactory = new FtpServerFactory();
-                        serverFactory.addListener("default", factory.createListener());
-                        //FTP用户名
-                        BaseUser user = new BaseUser();
-                        user.setName("user");
-                        user.setPassword("user");
-                        //FTP根目录
-                        String rootPath=Environment.getExternalStorageDirectory().getPath();
-                        AppLogger.e(">>>>>>rootPath:"+rootPath);
-                        user.setHomeDirectory(rootPath);
-                        //FTP权限
-                        List<Authority> authorities = new ArrayList<Authority>();
-                        authorities.add(new WritePermission());
-                        user.setAuthorities(authorities);
-                        try {
-                            serverFactory.getUserManager().save(user);
-                            if(ftpServer != null) {
-                                ftpServer.stop();
-                            }
-                            ftpServer = serverFactory.createServer();
-                            ftpServer.start();
-                            AppLogger.e(">>>>FTP Server start success!");
-                        }catch (Exception e){
-                            e.printStackTrace();
-                            AppLogger.e(">>>>FTP Server start failed!");
-                        }
-    }
-
-    //停止FTP Server
-    private void stopFTPServer(){
-                        if (ftpServer != null) {
-                            ftpServer.stop();
-                        }
-                        ftpServer = null;
-                        AppLogger.e(">>>>FTP Server stop success!");
-    }
-
-
-
-
 
     @Override
     public void onDestroy() {
@@ -398,7 +345,7 @@ public class CowService extends Service implements HttpServerRequestCallback {
         if (compositeDisposable != null)
             compositeDisposable.clear();
 
-        stopFTPServer();
+
     }
 
     /**

@@ -272,8 +272,6 @@ dependencies {
     implementation 'cn.yipianfengye.android:zxing-library:2.2'
     api 'cn.hutool:hutool-all:5.7.3'
 
-    implementation project(':apache-ftpserver-1.1.1:core')
-    implementation project(':apache-ftpserver-1.1.1:ftplet-api')
     implementation 'commons-io:commons-io:2.6'
 
 //    implementation 'com.google.android.exoplayer:exoplayer-core:2.14.1'
