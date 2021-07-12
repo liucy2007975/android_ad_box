@@ -17,28 +17,22 @@ import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 
+import android.os.Environment;
 import android.view.KeyEvent;
 import android.view.WindowManager;
 
+import com.alibaba.fastjson.JSON;
 import com.blankj.utilcode.util.FileUtils;
 import com.cow.liucy.box.service.UdiskEvent;
 import com.cow.liucy.face.R;
 import com.cow.liucy.libcommon.base.BaseActivity;
 import com.cow.liucy.libcommon.logger.AppLogger;
+import com.cow.liucy.libcommon.rxnetty.CommandVo;
 import com.cow.liucy.libcommon.usbmonitor.Constant;
-import com.cow.liucy.libcommon.usbmonitor.Util;
 import com.cow.liucy.libcommon.utils.Constants;
-import com.cow.liucy.libcommon.utils.Utils;
-import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.audio.AudioListener;
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
-import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.PlayerView;
-import com.google.android.exoplayer2.ui.StyledPlayerView;
-import com.google.android.exoplayer2.upstream.BandwidthMeter;
-import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -53,6 +47,7 @@ public class MainActivity extends BaseActivity {
     private LocalBroadcastManager localBroadcastManager;
     private IntentFilter intentFilter;
     private LocalReceiver localReceiver;
+
 //===============注册/反注册====================>>
     private static final int READ_EXTERNAL_STORAGE_CODE = 0;
 
@@ -62,8 +57,11 @@ public class MainActivity extends BaseActivity {
     public static final int KEYCODE_NEXT = 22;
     public static final int KEYCODE_PAUSE = 23;
 
-    private PlayerView playerView=null;
+    private PlayerView videoPlayerView =null;
+    private SimpleExoPlayer videoPlayer=null;
+    private SimpleExoPlayer audioPlayer=null;
     AudioManager audiomanager;//音频管理器
+
 
 
     @Override
@@ -77,14 +75,14 @@ public class MainActivity extends BaseActivity {
         //获取音频管理器服务
         audiomanager=(AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
-        playerView = findViewById(R.id.player_view);
+        videoPlayerView = findViewById(R.id.player_view);
 
-        SimpleExoPlayer player = new SimpleExoPlayer.Builder(this)
+        videoPlayer = new SimpleExoPlayer.Builder(this)
                 .build();
-        SimpleExoPlayer audioPlayer = new SimpleExoPlayer.Builder(this)
+        audioPlayer = new SimpleExoPlayer.Builder(this)
                 .build();;
 
-        playerView.setPlayer(player);
+        videoPlayerView.setPlayer(videoPlayer);
 
         File audioPath=new File(Constants.AUDIO_PATH);
         for (File file : audioPath.listFiles()){
@@ -102,18 +100,17 @@ public class MainActivity extends BaseActivity {
             if(file.exists()) {
                 uri = Uri.fromFile(file);
                 MediaItem item = MediaItem.fromUri(uri);
-                player.addMediaItem(item);
+                videoPlayer.addMediaItem(item);
             }
         }
 
-        player.getAudioSessionId();
 
 
-        player.setVolume(0f);//静音
+        videoPlayer.setVolume(0f);//静音
         //  准备播放
-        player.prepare();
+        videoPlayer.prepare();
         // 开始播放
-        player.play();
+        videoPlayer.play();
 
 
         AppLogger.e(">>>>最大音量："+audiomanager.getStreamMaxVolume(AudioManager.STREAM_MUSIC));//最大值： 100
@@ -141,9 +138,9 @@ public class MainActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
         AppLogger.e(">>>>>>onResume");
-        playerView.getPlayer().prepare();
-        playerView.getPlayer().play();
-        playerView.onResume();
+        videoPlayerView.getPlayer().prepare();
+        videoPlayerView.getPlayer().play();
+        videoPlayerView.onResume();
         localBroadcastManager = LocalBroadcastManager.getInstance(this);
         intentFilter = new IntentFilter();
         intentFilter.addAction(Constant.ACTION_USB_RECEIVER);
@@ -180,6 +177,74 @@ public class MainActivity extends BaseActivity {
             }
         }
         //退出应用
+
+    }
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        AppLogger.e(">>>>>>onPause");
+        videoPlayerView.getPlayer().pause();
+        videoPlayerView.onPause();
+        localBroadcastManager.unregisterReceiver(localReceiver);
+    }
+
+    /**
+     * 重写finish()方法
+     */
+    @Override
+    public void finish() {
+        //super.finish(); //记住不要执行此句
+        AppLogger.e(">>>>>>finish");
+        moveTaskToBack(true); //设置该activity永不过期，即不执行onDestroy()
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        AppLogger.e(">>>>>>onStop");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        AppLogger.e(">>>>>>onDestroy");
+        videoPlayerView.getPlayer().release();
+        EventBus.getDefault().unregister(this);
+    }
+
+    private class LocalReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String data = intent.getStringExtra("data");
+            AppLogger.d( "收到本地广播==>>" + data);
+            if (data.equals("USB_MOUNT")) {
+                String path = intent.getStringExtra("path");
+                AppLogger.d(  "收到本地广播=path=>>" +  path);
+                EventBus.getDefault().post(new UdiskEvent(path));
+            }
+            //mHandler.sendMessage(msg);
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.BACKGROUND)
+    public void onUdiskEvent(UdiskEvent udiskEvent) {
+        AppLogger.e(">>>>>onUdiskEvent:"+udiskEvent.getPath());
+
+        FileUtils.copyDir(udiskEvent.getPath()+"/ad_box", Environment.getExternalStorageDirectory().getPath() + "/ad_box");
+        //读取系统配置文件进行配置；
+        //音频文件、视频文件拷贝至相应目录
+
+    }
+
+    /**
+     * 服务器播放控制指令
+     * @param commandVo
+     */
+    @Subscribe(threadMode = ThreadMode.BACKGROUND)
+    public void onCommandEvent(CommandVo commandVo) {
+        AppLogger.e(">>>>>onCommandEvent:"+ JSON.toJSONString(commandVo));
 
     }
 
@@ -237,61 +302,6 @@ public class MainActivity extends BaseActivity {
         }
 //        showSeekBar(); // 有按键操作显示进度条
         return super.onKeyDown(keyCode, event);
-
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        AppLogger.e(">>>>>>onPause");
-        playerView.getPlayer().pause();
-        playerView.onPause();
-        localBroadcastManager.unregisterReceiver(localReceiver);
-    }
-
-    /**
-     * 重写finish()方法
-     */
-    @Override
-    public void finish() {
-        //super.finish(); //记住不要执行此句
-        AppLogger.e(">>>>>>finish");
-        moveTaskToBack(true); //设置该activity永不过期，即不执行onDestroy()
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        AppLogger.e(">>>>>>onStop");
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        AppLogger.e(">>>>>>onDestroy");
-        playerView.getPlayer().release();
-        EventBus.getDefault().unregister(this);
-    }
-
-    private class LocalReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String data = intent.getStringExtra("data");
-            AppLogger.d( "收到本地广播==>>" + data);
-            if (data.equals("USB_MOUNT")) {
-                String path = intent.getStringExtra("path");
-                AppLogger.d(  "收到本地广播=path=>>" +  path);
-                EventBus.getDefault().post(new UdiskEvent(path));
-            }
-            //mHandler.sendMessage(msg);
-        }
-    }
-
-    @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    public void onUdiskEvent(UdiskEvent udiskEvent) {
-        AppLogger.e(">>>>>onUdiskEvent:"+udiskEvent.getPath());
-
-        FileUtils.copyDir(udiskEvent.getPath()+"/sprogram",Constants.APP_DEF_PATH+"video");
 
     }
 
