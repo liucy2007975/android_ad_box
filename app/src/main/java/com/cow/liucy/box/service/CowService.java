@@ -103,24 +103,14 @@ public class CowService extends Service implements HttpServerRequestCallback {
     private AsyncHttpServer server;
     private boolean startFlag = false;
     final String[] getUrlList = new String[]{HELLO};
-    final String[] urlList = new String[]{FILE,HTTP_SET,HTTP_RESET,POST_UPLOAD_URL,POST_UPLOAD_IMAGE_URL,HTTP_DEBUG};
+    final String[] urlList = new String[]{FILE,HTTP_SET};
     private static final String HELLO="/status";
     private static final String FILE="/file";
     private static final String HTTP_SET="/set";
-    private static final String HTTP_DEBUG="/debug";
-    private static final String HTTP_RESET="/reset";
 
-    private static final String POST_UPLOAD_URL="/ParkAPI/upload";
-    private static final String POST_UPLOAD_IMAGE_URL="/ParkAPI/uploadImage";
-    AsyncHttpClient client=AsyncHttpClient.getDefaultInstance();
-    public static int uploadCount=0;
-    public static boolean updating=false;
 
     private FtpServer ftpServer;
     private Disposable mDisposableRecreate;
-
-    List<String> ipList=new ArrayList<>();
-
 
     FileAlterationObserver observer=null;
     FileAlterationObserverCallBack fileAlterationObserverCallBack=null;
@@ -160,38 +150,25 @@ public class CowService extends Service implements HttpServerRequestCallback {
          * 设备定时重启，凌晨2点左右定时重启
          * 每500ms检查一次时间是否是02:00:00
          */
-        Flowable.interval(500,TimeUnit.MILLISECONDS)
-                .subscribe(l->{
-                        String dateTime=DateTimeUtils.getFormatedDataString();
-                        if (dateTime.contains(" 02:00:00")){
-                            AppLogger.e(">>>>>>dateTime:>>>>>"+dateTime);
-                            AppLogger.e(">>>>>>设备定时重启>>>>>");
-
-
-                            try {
-                                //清空/ftp目录
-                                FileUtil.del(Constants.FTP_DEF_PATH);
-                            }catch (Exception e){
-                                e.printStackTrace();
-                            }
-                            ShellUtils.execCmd("reboot",false);
-                        }
-
-                },e->{
-                    e.printStackTrace();
-                });
-
-//        File file = FileUtil.file(Environment.getExternalStorageDirectory().getPath() + "/ftp");
-//        WatchMonitor.createAll(file, new SimpleWatcher(){
-//            @Override
-//            public void onCreate(WatchEvent<?> event, Path currentPath) {
-//                AppLogger.e(">>>>>createAll>>>onCreate:"+currentPath);
-//            }
-//        }).start();
-
-        //初始化监听ftp目录
-//        fileObserverJni = new FileObserverJni(Environment.getExternalStorageDirectory().getPath()  + "/ftp", FileObserverJni.CREATE);
-//        fileObserverJni.setmCallback(new FileObserverJniCallBack());
+//        Flowable.interval(500,TimeUnit.MILLISECONDS)
+//                .subscribe(l->{
+//                        String dateTime=DateTimeUtils.getFormatedDataString();
+//                        if (dateTime.contains(" 02:00:00")){
+//                            AppLogger.e(">>>>>>dateTime:>>>>>"+dateTime);
+//                            AppLogger.e(">>>>>>设备定时重启>>>>>");
+//
+//                            try {
+//                                //清空/ftp目录
+//                                FileUtil.del(Constants.FTP_DEF_PATH);
+//                            }catch (Exception e){
+//                                e.printStackTrace();
+//                            }
+//                            ShellUtils.execCmd("reboot",false);
+//                        }
+//
+//                },e->{
+//                    e.printStackTrace();
+//                });
 
         observer = new FileAlterationObserver(new File(Environment.getExternalStorageDirectory().getPath()  + "/ftp"));
         fileAlterationObserverCallBack=new FileAlterationObserverCallBack();
@@ -430,7 +407,7 @@ public class CowService extends Service implements HttpServerRequestCallback {
     private void showNotification() {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this.getApplicationContext(), "1");
         builder.setSmallIcon(R.mipmap.ic_launcher);
-        builder.setContentTitle("停车场数据采集服务");
+        builder.setContentTitle("广告机服务");
         builder.setContentText("服务正在运行...");
         builder.setContentInfo("");
         builder.setWhen(System.currentTimeMillis());
@@ -490,82 +467,6 @@ public class CowService extends Service implements HttpServerRequestCallback {
             case FILE:
 //                AppLogger.e(">>>>>json:"+request.getBody().getContentType()); ;
                 break;
-            case HTTP_DEBUG:
-                //构建对象
-                String json12= null;
-                try {
-                    json12 = URLDecoder.decode(request.getBody().get().toString(), "UTF-8");
-                    AppLogger.e(">>>>>json:" + json12);
-                    Object parse1 = JSON.parse(json12);
-                    String s = parse1.toString();
-
-                    CowDSNDto cowDSNDto1 = JSON.parseObject(s, CowDSNDto.class);
-                    if (Valid.valid(cowDSNDto1)) {
-                        //开启调试模式
-                        if (cowDSNDto1.getCellNo().equalsIgnoreCase("110")){
-                            CommandResult resultSetporp = Shell.run("setprop service.adb.tcp.port 5555");
-                            CommandResult resultStop = Shell.run("stop adbd");
-                            CommandResult resultStart = Shell.run("start adbd");
-                            if (resultSetporp.isSuccessful()) {
-                                AppLogger.e(">>>>" + resultSetporp.getStdout());
-                            }
-                            BaseResponse baseResponse22=new BaseResponse();
-                            baseResponse22.code=0;
-                            baseResponse22.datetime=DateTimeUtils.getFormatedDataString();
-                            response.send(JSON.toJSONString(baseResponse22));
-                        }
-                    }
-
-                }catch (Exception eee){
-
-                }
-                break;
-            case HTTP_RESET:
-//                execCommand("pm", "install", "-r", "/sdcard/v3.0.0_1_2021-06-04.apk");
-
-                //构建对象
-                String json1= null;
-                try {
-                    json1 = URLDecoder.decode(request.getBody().get().toString(), "UTF-8");
-                    AppLogger.e(">>>>>json:" + json1);
-                    Object parse1 = JSON.parse(json1);
-                    String s = parse1.toString();
-
-                    CowDSNDto cowDSNDto1 = JSON.parseObject(s, CowDSNDto.class);
-                    if (Valid.valid(cowDSNDto1)) {
-                        //重置数据库
-                        if (cowDSNDto1.getIsRest() == 1) {
-                            AppLogger.e("恢复出厂设置");
-                            AppPrefs.getInstance().setServer("");
-                            AppPrefs.getInstance().setSn("");
-                            AppPrefs.getInstance().setTerminalId("");
-                            AppPrefs.getInstance().setParkingId("");
-
-
-                            BaseResponse baseResponse22=new BaseResponse();
-                            baseResponse22.code=0;
-                            baseResponse22.datetime=DateTimeUtils.getFormatedDataString();
-                            response.send(JSON.toJSONString(baseResponse22));
-
-//                            FileUtils.deleteAllFile(new File(Constants.PICTURE_PATH));
-
-                            Flowable.just(0)
-                                    .observeOn(Schedulers.io())
-                                    .subscribe(l->{
-                                        try {
-                                            Thread.sleep(10000);
-                                        } catch (InterruptedException e) {
-                                            e.printStackTrace();
-                                        }
-                                        ShellUtils.execCmd("reboot",false);
-                                    });
-                            return;
-                        }
-                    }
-                }catch (Exception e){
-
-                }
-                break;
             case HTTP_SET:
                 //构建对象
                 String json= null;
@@ -577,26 +478,6 @@ public class CowService extends Service implements HttpServerRequestCallback {
 
                     CowDSNDto cowDSNDto = JSON.parseObject(s, CowDSNDto.class);
                     if (Valid.valid(cowDSNDto)) {
-//                if (cowDSNDto.getLocalIp().split("/").length < 2) {
-//                    AppLogger.e(">>>>>>>>>设置IP错误，格式不对");
-//                    return;
-//                }
-//                        if (!CommonUtils.getMacAddress().equals(cowDSNDto.getMacAddress())) {
-//                            AppLogger.e(">>>>>>远程配置：mac=" + cowDSNDto.getMacAddress() + "不是本机mac,本机=" + CommonUtils.getMacAddress());
-//                            return;
-//                        }
-//                        //开启调试模式
-//                        if (cowDSNDto.getCellNo().equalsIgnoreCase("110")){
-//
-//                            CommandResult resultSetporp = Shell.run("setprop service.adb.tcp.port 5555");
-//                            CommandResult resultStop = Shell.run("stop adbd");
-//                            CommandResult resultStart = Shell.run("start adbd");
-//                            if (resultSetporp.isSuccessful()) {
-//                                AppLogger.e(">>>>" + resultSetporp.getStdout());
-//                            }
-//
-//                        }
-
                         //服务器ip
                         String serverIp = cowDSNDto.getServerIp();
 
@@ -610,25 +491,6 @@ public class CowService extends Service implements HttpServerRequestCallback {
                             }catch (Exception e){
                                 e.printStackTrace();
                             }
-                        }
-//                if (!serverIp.startsWith("http")) {
-//                    serverIp = "http://" + serverIp;
-//                }
-//                if (!serverIp.endsWith("/")) {
-//                    serverIp = serverIp+"/";
-//                }
-                        if (Valid.valid(serverIp) && !serverIp.equals(AppPrefs.getInstance().getServer())) {
-
-                            //设置tcp ip
-                            AppLogger.e("serverIp="+serverIp);
-//                    URI uri = new URI(serverIp);
-//                    if (Valid.valid(uri.getHost()))
-//                        serverIp = uri.getHost();
-                            AppPrefs.getInstance().setServer(serverIp);
-
-                            //设置http ip
-                            RetrofitManager.resetRetrofitManager();
-
                         }
                         //设备Sn
                         String deviceSn = cowDSNDto.getDeviceSn();
@@ -700,93 +562,6 @@ public class CowService extends Service implements HttpServerRequestCallback {
 
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
-                }
-                break;
-            case POST_UPLOAD_URL:
-                //代理转发至服务器
-//                request.getHeaders()
-                //获取远端socket
-                try{
-                    AsyncNetworkSocket asyncSocket= (AsyncNetworkSocket) request.getSocket();
-                    AppLogger.e(">>>>>remoteIp:"+asyncSocket.getRemoteAddress().getHostString());
-                    Multimap nameValuePairs= request.getHeaders().getMultiMap();
-
-                    String sourceHeader="";
-                    Iterator<NameValuePair> nameValuePairIterator=nameValuePairs.iterator();
-                    while (nameValuePairIterator.hasNext()){
-                        NameValuePair nameValuePair=nameValuePairIterator.next();
-                        String name	=(String) nameValuePair.getName();
-                        String value = nameValuePair.getValue();
-                        sourceHeader+=(name+"-"+value)+";";
-//                       AppLogger.e(">>>>header："+name+"="+value);
-                    }
-
-                    String baseUrl = AppPrefs.getInstance().getServer();
-                    if (!Valid.valid(baseUrl)){
-                        baseUrl = CommonConfig.BASE_URL;
-                        AppPrefs.getInstance().setServer(CommonConfig.BASE_URL);
-                    }
-                    if (!baseUrl.endsWith("/")){
-                        baseUrl=baseUrl+"/";
-                    }
-//                    baseUrl="http://192.168.8.3:8080/";
-                    AppLogger.e(">>>>>post url:"+baseUrl+"parkingRecord/upload");
-//                    AsyncHttpRequest request1=new AsyncHttpRequest(Uri.parse(baseUrl+"parkingRecord/upload"),"GET",request.getHeaders());
-
-                    AsyncHttpPost post = new AsyncHttpPost(baseUrl+"parkingRecord/upload");
-                    post.disableProxy();
-                    post.setBody(request.getBody());
-                    post.setHeader("sourceHost",asyncSocket.getRemoteAddress().getHostString());
-                    post.setHeader("deviceSN",CommonUtils.getSN());
-                    post.setHeader("Content-Type",request.getHeaders().get("Content-Type"));
-                    post.setHeader("sourceHeader",sourceHeader);
-
-//                    AppLogger.e(">>>post Body:"+ JSON.toJSONString(request.getBody().get()));
-                    AppLogger.e(">>>post sourceHost:"+asyncSocket.getRemoteAddress().getHostString());
-                    AppLogger.e(">>>post sourceHeader:"+sourceHeader);
-
-                    client.getSocketMiddleware().setIdleTimeoutMs(20*1000);//20s超时
-
-                    client.executeString(post, new AsyncHttpClient.StringCallback() {
-                        @Override
-                        public void onCompleted(Exception e, AsyncHttpResponse source, String result) {
-                            if (source!=null){
-                                AppLogger.e(">>>>respone code:"+source.code()+">>>>>uploadCount:"+uploadCount );
-                                if (source.code()==200){
-                                    uploadCount++;
-                                    if (uploadCount>=9999){
-                                        uploadCount=0;
-                                    }
-                                }
-                            }else{
-                                AppLogger.e(">>>>>respone null please check network");
-                            }
-
-                        }
-                    });
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-
-                break;
-            case POST_UPLOAD_IMAGE_URL:
-                try{
-
-                    //将图片存储到FTP目录下，FTP目录触发自动上传
-                    String filePath=Constants.FTP_DEF_PATH+ UUID.fastUUID().toString()+".json";
-                    AppLogger.e(">>>>收到PC图片，存储路径为>>:"+filePath);
-//                    JSONObject jsonObject=JSON.parseObject();
-                    Object bodyJson=request.getBody().get();
-                    FileUtil.writeBytes(bodyJson.toString().getBytes(),filePath);
-
-                    BaseResponse baseResponseImage=new BaseResponse();
-                    baseResponseImage.code=0;
-                    baseResponseImage.datetime=DateTimeUtils.getFormatedDataString();
-                    response.send(JSON.toJSONString(baseResponseImage));
-
-                }catch (Exception e){
-                    e.printStackTrace();
-                    AppLogger.e(">>>>收到PC图片，写文件发生异常>>:"+e.getMessage());
                 }
                 break;
         }
