@@ -1,10 +1,10 @@
 <resources>
-    <string name="app_name">安居宝数据采集机</string>
+    <string name="app_name">广告机</string>
     <string name="about_gateway">网关：</string>
     <string name="about_hardware_version">硬件版本：</string>
     <string name="about_ip">IP地址：</string>
     <string name="about_mac">MAC：</string>
-    <string name="about_model">设备型号：AJB-ZJ18AA</string>
+    <string name="about_model">设备型号：V_Cow_2021</string>
     <string name="about_software_version">软件版本：</string>
     <string name="about_system_version">系统版本：</string>
     <string name="device_sn">设备Sn</string>
