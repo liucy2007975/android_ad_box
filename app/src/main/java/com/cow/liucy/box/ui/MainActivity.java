@@ -96,6 +96,7 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        AppLogger.e(">>>>>>onStart");
         if (!EventBus.getDefault().isRegistered(this))
         {
             EventBus.getDefault().register(this);
@@ -106,6 +107,8 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        AppLogger.e(">>>>>>onResume");
+        playerView.onResume();
         localBroadcastManager = LocalBroadcastManager.getInstance(this);
         intentFilter = new IntentFilter();
         intentFilter.addAction(Constant.ACTION_USB_RECEIVER);
@@ -205,12 +208,21 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        AppLogger.e(">>>>>>onPause");
+        playerView.onPause();
         localBroadcastManager.unregisterReceiver(localReceiver);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        AppLogger.e(">>>>>>onStop");
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        AppLogger.e(">>>>>>onDestroy");
         EventBus.getDefault().unregister(this);
     }
 
