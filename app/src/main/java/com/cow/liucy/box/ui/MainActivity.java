@@ -31,9 +31,11 @@ import com.cow.liucy.libcommon.rxnetty.CommandVo;
 import com.cow.liucy.libcommon.usbmonitor.Constant;
 import com.cow.liucy.libcommon.utils.Constants;
 import com.cow.liucy.libcommon.utils.Utils;
+import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.audio.AudioListener;
 import com.google.android.exoplayer2.source.DefaultMediaSourceFactory;
 import com.google.android.exoplayer2.source.LoopingMediaSource;
@@ -48,6 +50,12 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
 import java.util.List;
+
+import io.reactivex.Flowable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+
+import static com.google.android.exoplayer2.Player.TIMELINE_CHANGE_REASON_PLAYLIST_CHANGED;
 
 
 public class MainActivity extends BaseActivity {
@@ -101,9 +109,24 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onMediaItemTransition(
                     @Nullable MediaItem mediaItem, @Player.MediaItemTransitionReason int reason) {
-                AppLogger.e(">>>>videoPlayer>onMediaItemTransition:"+mediaItem.mediaId);
+                AppLogger.e(">>>>audioPlayer>onMediaItemTransition:");
 
             }
+
+            @Override
+            public void onTimelineChanged(
+                    Timeline timeline, @Player.TimelineChangeReason int reason) {
+                if (reason == TIMELINE_CHANGE_REASON_PLAYLIST_CHANGED) {
+                    // Update the UI according to the modified playlist (add, move or remove).
+                    AppLogger.e(">>>>audioPlayer>onTimelineChanged:"+reason);
+                }
+            }
+
+            @Override
+            public void onPositionDiscontinuity(Player.PositionInfo oldPosition, Player.PositionInfo newPosition, int reason) {
+                AppLogger.e(">>>>audioPlayer>onPositionDiscontinuity:"+reason);
+            }
+
         });
 
         videoPlayer.addListener(new Player.Listener() {
@@ -123,6 +146,21 @@ public class MainActivity extends BaseActivity {
                 AppLogger.e(">>>>videoPlayer>onMediaItemTransition:");
 
             }
+
+
+            @Override
+            public void onTimelineChanged(
+                    Timeline timeline, @Player.TimelineChangeReason int reason) {
+                if (reason == TIMELINE_CHANGE_REASON_PLAYLIST_CHANGED) {
+                    // Update the UI according to the modified playlist (add, move or remove).
+                    AppLogger.e(">>>>videoPlayer>onTimelineChanged:"+reason);
+                }
+            }
+
+            @Override
+            public void onPositionDiscontinuity(Player.PositionInfo oldPosition, Player.PositionInfo newPosition, int reason) {
+                AppLogger.e(">>>>videoPlayer>onPositionDiscontinuity:"+reason);
+            }
         });
 
         videoPlayerView.setPlayer(videoPlayer);
@@ -141,11 +179,16 @@ public class MainActivity extends BaseActivity {
         for (File file : videoPath.listFiles()){
             Uri uri = null;
             if(file.exists()) {
+                String index=file.getName().substring(0,file.getName().length()-4);
+                AppLogger.e(">>>index:"+index);
                 uri = Uri.fromFile(file);
                 MediaItem item = MediaItem.fromUri(uri);
-                videoPlayer.addMediaItem(item);
+                videoPlayer.addMediaItem(Integer.parseInt(index),item);
             }
         }
+        MediaSource[] mediaSource= new MediaSource[10];
+
+
         videoPlayer.setRepeatMode(Player.REPEAT_MODE_ALL);
 
 //        videoPlayer.setVolume(0f);//静音
@@ -296,6 +339,7 @@ public class MainActivity extends BaseActivity {
             File file=new File(Constants.VIDEO_PATH+commandVo.getVideoNo()+".mp4");
             if (file.exists()){
 
+                videoPlayer.setRepeatMode(Player.REPEAT_MODE_OFF);
                 int videoNo=Integer.parseInt(commandVo.getVideoNo());
 
                 if (videoNo<=100) {
@@ -303,47 +347,60 @@ public class MainActivity extends BaseActivity {
                 }else{
                     videoPlayer.setVolume(1f);//视频取消静音
                 }
+                AppLogger.e(">>>>>开始播放视频:"+ file.getName());
 
 
                 Uri uri = Uri.fromFile(file);
                 MediaItem item = MediaItem.fromUri(uri);
+//                videoPlayerView.onPause();
+//                // 开始播放
+//                videoPlayer.setPlayWhenReady(false);
                 //清除MediaItems
-                videoPlayer.clearMediaItems();
+//                videoPlayer.clearMediaItems();
                 //播放指定音频逻辑
                 if (commandVo.getVideoNo().equals("03")){
                     //按循环次数播放 指定音频
                     int count= Integer.parseInt(commandVo.getVideoCirc());//循环次数
                     videoPlayer.setRepeatMode(Player.REPEAT_MODE_OFF);
                     LoopingMediaSource loopingMediaSource = new LoopingMediaSource(new DefaultMediaSourceFactory(Utils.getContext()).createMediaSource(item),count);
-                    videoPlayer.setMediaSource(loopingMediaSource);
+                    videoPlayer.setMediaSource(loopingMediaSource,true);
 
                 }else if (commandVo.getVideoNo().equals("01")){
                     videoPlayer.setRepeatMode(Player.REPEAT_MODE_OFF);
                     //只播放一次 指定音频
-                    videoPlayer.setMediaItem(item);
+//                    videoPlayer.setMediaItem(item,true);
+                    videoPlayer.seekTo(0, C.TIME_UNSET);
 
                 }else if (commandVo.getVideoNo().equals("02")){
                     //循环播放 指定音频
                     //只播放一次 指定音频
-                    videoPlayer.setMediaItem(item);
+//                    videoPlayer.setMediaItem(item,true);
+                    videoPlayer.seekTo(0, C.TIME_UNSET);
                     videoPlayer.setRepeatMode(Player.REPEAT_MODE_ONE);
                 }
 
-                //  准备播放
-                videoPlayer.prepare();
-                // 开始播放
-                videoPlayer.play();
+//                videoPlayerView.onResume();
+                Flowable.just(0).observeOn(AndroidSchedulers.mainThread()).subscribe(l->{
+                    //  准备播放
+                    videoPlayer.prepare();
+                    // 开始播放
+                    videoPlayer.play();
+                    videoPlayerView.onResume();
+                });
+
             }else{
                 AppLogger.e(">>>>需要播放的视频文件不存在！");
             }
 
         }else{//停止视频
             if (videoPlayer!=null){
-                videoPlayer.stop();
+                videoPlayer.setPlayWhenReady(false);
             }
         }
 
         if(!commandVo.getAudioNo().equals("000")){//需要播放音频
+
+            audioPlayer.setVolume(1f);//音频开放
 
             File file=new File(Constants.AUDIO_PATH+commandVo.getAudioNo()+".mp3");
             if (file.exists()){
@@ -353,26 +410,28 @@ public class MainActivity extends BaseActivity {
                 Uri uri = Uri.fromFile(file);
                 MediaItem item = MediaItem.fromUri(uri);
 
+                AppLogger.e(">>>>>开始播放音频:"+ file.getName());
+
                 //清除MediaItems
                 audioPlayer.clearMediaItems();
 
                 //播放指定音频逻辑
                 if (commandVo.getAudioMod().equals("03")){
                     //按循环次数播放 指定音频
-                   int count= Integer.parseInt(commandVo.getAudioCirc());//循环次数
-                   audioPlayer.setRepeatMode(Player.REPEAT_MODE_OFF);
+                    int count= Integer.parseInt(commandVo.getAudioCirc());//循环次数
+                    audioPlayer.setRepeatMode(Player.REPEAT_MODE_OFF);
                     LoopingMediaSource loopingMediaSource = new LoopingMediaSource(new DefaultMediaSourceFactory(Utils.getContext()).createMediaSource(item),count);
-                    audioPlayer.setMediaSource(loopingMediaSource);
+                    audioPlayer.setMediaSource(loopingMediaSource,true);
 
                 }else if (commandVo.getAudioMod().equals("01")){
                     audioPlayer.setRepeatMode(Player.REPEAT_MODE_OFF);
                     //只播放一次 指定音频
-                    audioPlayer.setMediaItem(item);
+                    audioPlayer.setMediaItem(item,true);
 
                 }else if (commandVo.getAudioMod().equals("02")){
                     //循环播放 指定音频
                     //只播放一次 指定音频
-                    audioPlayer.setMediaItem(item);
+                    audioPlayer.setMediaItem(item,true);
                     audioPlayer.setRepeatMode(Player.REPEAT_MODE_ONE);
                 }
                 //  准备播放
@@ -388,7 +447,7 @@ public class MainActivity extends BaseActivity {
             videoPlayer.setVolume(1f);//视频取消静音
 
             if (audioPlayer!=null){
-                audioPlayer.stop();
+                audioPlayer.setPlayWhenReady(false);
             }
         }
     }
