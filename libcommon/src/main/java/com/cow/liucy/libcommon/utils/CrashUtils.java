@@ -4,6 +4,8 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Environment;
+import android.os.SystemClock;
+
 import androidx.annotation.NonNull;
 
 import java.io.File;
@@ -95,6 +97,9 @@ public final class CrashUtils {
                             if (pw != null) {
                                 pw.close();
                             }
+                            SystemClock.sleep(3000);
+                            android.os.Process.killProcess(android.os.Process.myPid());
+                            System.exit(0);
                         }
                     }
                 }).start();

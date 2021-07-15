@@ -30,12 +30,15 @@ import com.cow.liucy.libcommon.logger.AppLogger;
 import com.cow.liucy.libcommon.rxnetty.CommandVo;
 import com.cow.liucy.libcommon.usbmonitor.Constant;
 import com.cow.liucy.libcommon.utils.Constants;
+import com.cow.liucy.libcommon.utils.Utils;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.audio.AudioListener;
+import com.google.android.exoplayer2.source.DefaultMediaSourceFactory;
 import com.google.android.exoplayer2.source.LoopingMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.MediaSourceFactory;
 import com.google.android.exoplayer2.text.Cue;
 import com.google.android.exoplayer2.ui.PlayerView;
 
@@ -94,12 +97,30 @@ public class MainActivity extends BaseActivity {
             public void onPlaybackStateChanged(int state) {
                 AppLogger.e(">>>>audioPlayer>onPlaybackStateChanged:"+state);
             }
+
+            @Override
+            public void onMediaItemTransition(
+                    @Nullable MediaItem mediaItem, @Player.MediaItemTransitionReason int reason) {
+                AppLogger.e(">>>>videoPlayer>onMediaItemTransition:"+mediaItem.mediaId);
+
+            }
         });
 
         videoPlayer.addListener(new Player.Listener() {
             @Override
             public void onPlaybackStateChanged(int state) {
                 AppLogger.e(">>>>videoPlayer>onPlaybackStateChanged:"+state);
+                switch (state){
+                    case Player.STATE_READY:
+                        break;
+                    case Player.STATE_ENDED:
+                        break;
+                }
+            }
+            @Override
+            public void onMediaItemTransition(
+                    @Nullable MediaItem mediaItem, @Player.MediaItemTransitionReason int reason) {
+                AppLogger.e(">>>>videoPlayer>onMediaItemTransition:");
 
             }
         });
@@ -125,22 +146,26 @@ public class MainActivity extends BaseActivity {
                 videoPlayer.addMediaItem(item);
             }
         }
+        videoPlayer.setRepeatMode(Player.REPEAT_MODE_ALL);
 
-        videoPlayer.setVolume(0f);//静音
+//        videoPlayer.setVolume(0f);//静音
         //  准备播放
         videoPlayer.prepare();
         // 开始播放
-        videoPlayer.play();
+//        videoPlayer.play();
+        videoPlayer.setPlayWhenReady(true);
 
 
         AppLogger.e(">>>>最大音量："+audiomanager.getStreamMaxVolume(AudioManager.STREAM_MUSIC));//最大值： 100
 
-        audiomanager.setStreamVolume(AudioManager.STREAM_MUSIC, 17, AudioManager.FLAG_SHOW_UI);
+        audiomanager.setStreamVolume(AudioManager.STREAM_MUSIC, 10, AudioManager.FLAG_SHOW_UI);
 
+        audioPlayer.setVolume(0f);
         //  准备播放
         audioPlayer.prepare();
         // 开始播放
-        audioPlayer.play();
+//        audioPlayer.play();
+        audioPlayer.setPlayWhenReady(true);
     }
 
     @Override
@@ -205,7 +230,6 @@ public class MainActivity extends BaseActivity {
     protected void onPause() {
         super.onPause();
         AppLogger.e(">>>>>>onPause");
-        videoPlayerView.getPlayer().pause();
         videoPlayerView.onPause();
         localBroadcastManager.unregisterReceiver(localReceiver);
     }
@@ -262,7 +286,7 @@ public class MainActivity extends BaseActivity {
      * 服务器播放控制指令
      * @param commandVo
      */
-    @Subscribe(threadMode = ThreadMode.BACKGROUND)
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onCommandEvent(CommandVo commandVo) {
         AppLogger.e(">>>>>onCommandEvent:"+ JSON.toJSONString(commandVo));
         this.commandVo=commandVo;
@@ -290,16 +314,18 @@ public class MainActivity extends BaseActivity {
                     //按循环次数播放 指定音频
                     int count= Integer.parseInt(commandVo.getVideoCirc());//循环次数
                     videoPlayer.setRepeatMode(Player.REPEAT_MODE_OFF);
+                    LoopingMediaSource loopingMediaSource = new LoopingMediaSource(new DefaultMediaSourceFactory(Utils.getContext()).createMediaSource(item),count);
+                    videoPlayer.setMediaSource(loopingMediaSource);
 
                 }else if (commandVo.getVideoNo().equals("01")){
                     videoPlayer.setRepeatMode(Player.REPEAT_MODE_OFF);
                     //只播放一次 指定音频
-                    videoPlayer.addMediaItem(item);
+                    videoPlayer.setMediaItem(item);
 
                 }else if (commandVo.getVideoNo().equals("02")){
                     //循环播放 指定音频
                     //只播放一次 指定音频
-                    videoPlayer.addMediaItem(item);
+                    videoPlayer.setMediaItem(item);
                     videoPlayer.setRepeatMode(Player.REPEAT_MODE_ONE);
                 }
 
@@ -335,17 +361,18 @@ public class MainActivity extends BaseActivity {
                     //按循环次数播放 指定音频
                    int count= Integer.parseInt(commandVo.getAudioCirc());//循环次数
                    audioPlayer.setRepeatMode(Player.REPEAT_MODE_OFF);
-
+                    LoopingMediaSource loopingMediaSource = new LoopingMediaSource(new DefaultMediaSourceFactory(Utils.getContext()).createMediaSource(item),count);
+                    audioPlayer.setMediaSource(loopingMediaSource);
 
                 }else if (commandVo.getAudioMod().equals("01")){
                     audioPlayer.setRepeatMode(Player.REPEAT_MODE_OFF);
                     //只播放一次 指定音频
-                    audioPlayer.addMediaItem(item);
+                    audioPlayer.setMediaItem(item);
 
                 }else if (commandVo.getAudioMod().equals("02")){
                     //循环播放 指定音频
                     //只播放一次 指定音频
-                    audioPlayer.addMediaItem(item);
+                    audioPlayer.setMediaItem(item);
                     audioPlayer.setRepeatMode(Player.REPEAT_MODE_ONE);
                 }
                 //  准备播放

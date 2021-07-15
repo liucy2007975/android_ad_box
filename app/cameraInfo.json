@@ -1,4 +1,0 @@
-[{"cameraIp":"192.168.8.10","deviceType":3,"portDirect":0,"portName":"出口1"},{"cameraIp":"192.168.8.101","deviceType":4,"portDirect":0,"portName":"入口1"},{"cameraIp":"192.168.11.104","deviceType":4,"portDirect":0,"portName":"外口1（入主）"},{"cameraIp":"192.168.11.106","deviceType":4,"portDirect":0,"portName":"里口1（入主）"},{"cameraIp":"192.168.11.112","deviceType":4,"portDirect":1,"portName":"外口2（出主）"},{"cameraIp":"192.168.11.114","deviceType":4,"portDirect":1,"portName":"里口2（出主）"},{"cameraIp":"192.168.11.105","deviceType":4,"portDirect":0,"portName":"外口1（入副）"},
-  {"cameraIp":"192.168.11.110","deviceType":4,"portDirect":0,"portName":"里口1（入副）"},
-  {"cameraIp":"192.168.11.113","deviceType":4,"portDirect":1,"portName":"外口2（出副）"},{"cameraIp":"192.168.11.115","deviceType":4,"portDirect":1,"portName":"里口2（出副）"}]
-
