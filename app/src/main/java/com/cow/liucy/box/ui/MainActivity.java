@@ -49,7 +49,9 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.Flowable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -79,6 +81,7 @@ public class MainActivity extends BaseActivity {
     private SimpleExoPlayer audioPlayer=null;
     AudioManager audiomanager;//音频管理器
     private CommandVo commandVo=null;//当前播放指令
+    private Map<String,Integer> videoIndexNameMap=new HashMap<String,Integer>();
 
 
 
@@ -144,7 +147,11 @@ public class MainActivity extends BaseActivity {
             public void onMediaItemTransition(
                     @Nullable MediaItem mediaItem, @Player.MediaItemTransitionReason int reason) {
                 AppLogger.e(">>>>videoPlayer>onMediaItemTransition:");
-
+                if (mediaItem != null && mediaItem.playbackProperties != null) {
+                    AppLogger.e(">>>>>mediaItem!=null");
+//                    videoPlayer.prepare();
+//                    videoPlayer.play();
+                }
             }
 
 
@@ -159,7 +166,7 @@ public class MainActivity extends BaseActivity {
 
             @Override
             public void onPositionDiscontinuity(Player.PositionInfo oldPosition, Player.PositionInfo newPosition, int reason) {
-                AppLogger.e(">>>>videoPlayer>onPositionDiscontinuity:"+reason);
+                AppLogger.e(">>>>videoPlayer>onPositionDiscontinuity:oldPosition:"+oldPosition.windowIndex+">>>>newPosition:"+newPosition.windowIndex);
             }
         });
 
@@ -175,19 +182,20 @@ public class MainActivity extends BaseActivity {
             }
         }
 
+
         File videoPath=new File(Constants.VIDEO_PATH);
-        for (File file : videoPath.listFiles()){
+        for (int i=0;i<videoPath.listFiles().length;i++){
+            File file=videoPath.listFiles()[i];
             Uri uri = null;
             if(file.exists()) {
                 String index=file.getName().substring(0,file.getName().length()-4);
                 AppLogger.e(">>>index:"+index);
                 uri = Uri.fromFile(file);
                 MediaItem item = MediaItem.fromUri(uri);
-                videoPlayer.addMediaItem(Integer.parseInt(index),item);
+                videoIndexNameMap.put(index,i);
+                videoPlayer.addMediaItem(i,item);
             }
         }
-        MediaSource[] mediaSource= new MediaSource[10];
-
 
         videoPlayer.setRepeatMode(Player.REPEAT_MODE_ALL);
 
@@ -350,51 +358,40 @@ public class MainActivity extends BaseActivity {
                 AppLogger.e(">>>>>开始播放视频:"+ file.getName());
 
 
+//                videoPlayer.clearMediaItems();
                 Uri uri = Uri.fromFile(file);
                 MediaItem item = MediaItem.fromUri(uri);
-//                videoPlayerView.onPause();
-//                // 开始播放
-//                videoPlayer.setPlayWhenReady(false);
+//                // 暂停播放
+                pauseVideoPlayer();
                 //清除MediaItems
-//                videoPlayer.clearMediaItems();
+                videoPlayer.clearMediaItems();
                 //播放指定音频逻辑
-                if (commandVo.getVideoNo().equals("03")){
+                if (commandVo.getVideoMod().equals("03")){
                     //按循环次数播放 指定音频
                     int count= Integer.parseInt(commandVo.getVideoCirc());//循环次数
                     videoPlayer.setRepeatMode(Player.REPEAT_MODE_OFF);
                     LoopingMediaSource loopingMediaSource = new LoopingMediaSource(new DefaultMediaSourceFactory(Utils.getContext()).createMediaSource(item),count);
                     videoPlayer.setMediaSource(loopingMediaSource,true);
 
-                }else if (commandVo.getVideoNo().equals("01")){
+                }else if (commandVo.getVideoMod().equals("01")){
                     videoPlayer.setRepeatMode(Player.REPEAT_MODE_OFF);
                     //只播放一次 指定音频
-//                    videoPlayer.setMediaItem(item,true);
-                    videoPlayer.seekTo(0, C.TIME_UNSET);
+                    videoPlayer.setMediaItem(item,true);
 
-                }else if (commandVo.getVideoNo().equals("02")){
+                }else if (commandVo.getVideoMod().equals("02")){
                     //循环播放 指定音频
                     //只播放一次 指定音频
-//                    videoPlayer.setMediaItem(item,true);
-                    videoPlayer.seekTo(0, C.TIME_UNSET);
+                    videoPlayer.setMediaItem(item,true);
                     videoPlayer.setRepeatMode(Player.REPEAT_MODE_ONE);
                 }
-
-//                videoPlayerView.onResume();
-                Flowable.just(0).observeOn(AndroidSchedulers.mainThread()).subscribe(l->{
-                    //  准备播放
-                    videoPlayer.prepare();
-                    // 开始播放
-                    videoPlayer.play();
-                    videoPlayerView.onResume();
-                });
-
+                startVideoPlayer();
             }else{
                 AppLogger.e(">>>>需要播放的视频文件不存在！");
             }
 
         }else{//停止视频
             if (videoPlayer!=null){
-                videoPlayer.setPlayWhenReady(false);
+                pauseVideoPlayer();
             }
         }
 
@@ -444,12 +441,22 @@ public class MainActivity extends BaseActivity {
             }
 
         }else{//停止音频
-            videoPlayer.setVolume(1f);//视频取消静音
 
             if (audioPlayer!=null){
                 audioPlayer.setPlayWhenReady(false);
             }
         }
+    }
+
+    private void pauseVideoPlayer(){
+        videoPlayer.setPlayWhenReady(false);
+        videoPlayer.getPlaybackState();
+    }
+
+    private void startVideoPlayer(){
+        videoPlayer.prepare();
+        videoPlayer.setPlayWhenReady(true);
+        videoPlayer.getPlaybackState();
     }
 
     @Override
