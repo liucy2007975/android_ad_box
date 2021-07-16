@@ -285,7 +285,7 @@ public class MainActivity extends BaseActivity {
                 //读取系统配置文件进行配置；
                 //音频文件、视频文件拷贝至相应目录
                 //读取配置文件，重启系统
-                SysConfig sysConfig= (SysConfig) JSON.parse(com.cow.liucy.libcommon.utils.FileUtils.readFile(Constants.SYS_CONFIG_PATH+"config.json"));
+                SysConfig sysConfig= (SysConfig) JSON.parseObject(FileUtils.readFile(Constants.SYS_CONFIG_PATH+"config.json"),SysConfig.class);
                 setConfig(sysConfig);
 
             }
@@ -301,14 +301,14 @@ public class MainActivity extends BaseActivity {
         String ipAndMask = sysConfig.getIp() + "/" + maskInt;
         String localDNS = "114.114.114.114";
         String localGateway=sysConfig.getGateway();
-        String mask=sysConfig.getSubmask();
-        ContentResolver contentResolver = getContentResolver();
-        Settings.System.putInt(contentResolver, "ethernet_use_static_ip", 1);
-
-        Settings.System.putString(contentResolver, "ethernet_static_ip", ipAndMask);
-        Settings.System.putString(contentResolver, "ethernet_static_gateway", localGateway);
-        Settings.System.putString(contentResolver, "ethernet_static_netmask", mask);
-        Settings.System.putString(contentResolver, "ethernet_static_dns1", localDNS);
+//        String mask=sysConfig.getSubmask();
+//        ContentResolver contentResolver = getContentResolver();
+//        Settings.System.putInt(contentResolver, "ethernet_use_static_ip", 1);
+//
+//        Settings.System.putString(contentResolver, "ethernet_static_ip", ipAndMask);
+//        Settings.System.putString(contentResolver, "ethernet_static_gateway", localGateway);
+//        Settings.System.putString(contentResolver, "ethernet_static_netmask", mask);
+//        Settings.System.putString(contentResolver, "ethernet_static_dns1", localDNS);
         Flowable.just(1)
                 .observeOn(AndroidSchedulers.mainThread())
                 .onBackpressureLatest()
