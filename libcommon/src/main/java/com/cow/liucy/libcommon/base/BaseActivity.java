@@ -20,7 +20,7 @@ import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
 
 
 /**
- * Created by fanyufeng on 2017-7-28.
+ * Created by cow on 2017-7-28.
  */
 
 public class BaseActivity extends RxAppCompatActivity {

@@ -36,21 +36,21 @@ public class RetrofitManager extends BaseRxScheduler {
 
     //--profile --offline
     private RetrofitManager() {
-        String baseUrl = AppPrefs.getInstance().getServer();
-        if (!Valid.valid(baseUrl)){
-            baseUrl = CommonConfig.BASE_URL;
-            AppPrefs.getInstance().setServer(CommonConfig.BASE_URL);
-        }
-        if (!baseUrl.endsWith("/")){
-            baseUrl=baseUrl+"/";
-        }
-        mRetrofit = new Retrofit.Builder()
-                .client(CowOkHttpClientFacotry.getOkHttpClient())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .addConverterFactory(FastJsonConverterFactory.create())
-                .baseUrl(baseUrl)
-                .build();
-        setApiService(mRetrofit.create(ApiService.class));
+//        String baseUrl = AppPrefs.getInstance().getServer();
+//        if (!Valid.valid(baseUrl)){
+//            baseUrl = CommonConfig.BASE_URL;
+//            AppPrefs.getInstance().setServer(CommonConfig.BASE_URL);
+//        }
+//        if (!baseUrl.endsWith("/")){
+//            baseUrl=baseUrl+"/";
+//        }
+//        mRetrofit = new Retrofit.Builder()
+//                .client(CowOkHttpClientFacotry.getOkHttpClient())
+//                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+//                .addConverterFactory(FastJsonConverterFactory.create())
+//                .baseUrl(baseUrl)
+//                .build();
+//        setApiService(mRetrofit.create(ApiService.class));
     }
 
     public ApiService getApiService() {

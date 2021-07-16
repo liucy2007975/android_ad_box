@@ -3,7 +3,7 @@ package com.cow.liucy.libcommon.api;
 
 
 /**
- * Created by fanyufeng on 2017-7-6.
+ * Created by cow on 2017-7-6.
  */
 
 public class CommonConfig {

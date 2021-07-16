@@ -7,9 +7,9 @@ public class SysConfig implements Serializable {
     private String ip;
     private String submask;
     private String gateway;
-    private String volume;
+    private Integer volume;
     private String tcpServerIP;
-    private String tcpServerPort;
+    private Integer tcpServerPort;
 
     public String getIp() {
         return ip;
@@ -27,13 +27,7 @@ public class SysConfig implements Serializable {
         this.gateway = gateway;
     }
 
-    public String getVolume() {
-        return volume;
-    }
 
-    public void setVolume(String volume) {
-        this.volume = volume;
-    }
 
     public String getTcpServerIP() {
         return tcpServerIP;
@@ -43,13 +37,7 @@ public class SysConfig implements Serializable {
         this.tcpServerIP = tcpServerIP;
     }
 
-    public String getTcpServerPort() {
-        return tcpServerPort;
-    }
 
-    public void setTcpServerPort(String tcpServerPort) {
-        this.tcpServerPort = tcpServerPort;
-    }
 
     public String getSubmask() {
         return submask;
@@ -57,5 +45,21 @@ public class SysConfig implements Serializable {
 
     public void setSubmask(String submask) {
         this.submask = submask;
+    }
+
+    public Integer getVolume() {
+        return volume;
+    }
+
+    public void setVolume(Integer volume) {
+        this.volume = volume;
+    }
+
+    public Integer getTcpServerPort() {
+        return tcpServerPort;
+    }
+
+    public void setTcpServerPort(Integer tcpServerPort) {
+        this.tcpServerPort = tcpServerPort;
     }
 }

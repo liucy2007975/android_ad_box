@@ -126,7 +126,7 @@ public class CowService extends Service   {
                 cowNettyManager.stop();
                 cowNettyManager=null;
             }
-            cowNettyManager =new CowNettyManager("192.168.8.3",9990);
+            cowNettyManager =new CowNettyManager(AppPrefs.getInstance().getServer(),AppPrefs.getInstance().getFtpPort());
             cowNettyManager.setNettyEvent(new CowNettyEvent() {
                 @Override
                 public void cowOnReciveData(String msg) {

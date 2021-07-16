@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Created by fanyufeng on 2017-8-7.
+ * Created by cow on 2017-8-7.
  */
 
 public class Constants {

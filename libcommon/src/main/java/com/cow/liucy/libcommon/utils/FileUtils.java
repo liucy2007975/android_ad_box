@@ -33,7 +33,7 @@ import timber.log.Timber;
 import static com.cow.liucy.libcommon.utils.Constants.APP_DEF_PATH_IMG;
 
 /**
- * Created by fanyufeng on 2017-7-17.
+ * Created by cow on 2017-7-17.
  */
 
 public final class FileUtils {

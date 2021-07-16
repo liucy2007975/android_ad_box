@@ -11,7 +11,7 @@ import java.net.ConnectException;
 import retrofit2.adapter.rxjava2.HttpException;
 
 /**
- * Created by fanyufeng on 2017-7-11.
+ * Created by cow on 2017-7-11.
  */
 
 public class ExceptionHandle {

@@ -24,8 +24,8 @@ import android.view.KeyEvent;
 import android.view.WindowManager;
 
 import com.alibaba.fastjson.JSON;
-import com.blankj.utilcode.util.FileUtils;
 import com.blankj.utilcode.util.ShellUtils;
+import com.cow.liucy.box.service.RebootEvent;
 import com.cow.liucy.box.service.UdiskEvent;
 import com.cow.liucy.face.R;
 import com.cow.liucy.libcommon.base.BaseActivity;
@@ -34,6 +34,7 @@ import com.cow.liucy.libcommon.rxnetty.CommandVo;
 import com.cow.liucy.libcommon.usbmonitor.Constant;
 import com.cow.liucy.libcommon.utils.AppPrefs;
 import com.cow.liucy.libcommon.utils.Constants;
+import com.cow.liucy.libcommon.utils.FileUtils;
 import com.cow.liucy.libcommon.utils.NetUtil;
 import com.cow.liucy.libcommon.utils.ToastUtils;
 import com.cow.liucy.libcommon.utils.Utils;
@@ -112,7 +113,7 @@ public class MainActivity extends BaseActivity {
                 .build();
         AppLogger.e(">>>>最大音量："+audiomanager.getStreamMaxVolume(AudioManager.STREAM_MUSIC));//最大值： 100
 
-        audiomanager.setStreamVolume(AudioManager.STREAM_MUSIC, 10, AudioManager.FLAG_SHOW_UI);
+//        audiomanager.setStreamVolume(AudioManager.STREAM_MUSIC, 10, AudioManager.FLAG_SHOW_UI);
 
         videoPlayerView.setPlayer(videoPlayer);
         initVideo();
@@ -277,27 +278,15 @@ public class MainActivity extends BaseActivity {
     public void onUdiskEvent(UdiskEvent udiskEvent) {
         AppLogger.e(">>>>>onUdiskEvent:"+udiskEvent.getPath());
         try{
-            boolean result= FileUtils.copyDir(udiskEvent.getPath() + "/ad_box", Environment.getExternalStorageDirectory().getPath() + "/ad_box",
-                    new FileUtils.OnReplaceListener() {
-                        @Override
-                        public boolean onReplace() {
-                            return true;
-                        }
-                    });
+            boolean result= FileUtils.copyDir(udiskEvent.getPath() + "/ad_box", Environment.getExternalStorageDirectory().getPath() + "/ad_box");
 
             AppLogger.e(">>>>>result:"+result);
             if (result){
                 //读取系统配置文件进行配置；
                 //音频文件、视频文件拷贝至相应目录
-//                Flowable.just(0).observeOn(AndroidSchedulers.mainThread()).subscribe(l->{
-//                    initVideo();
-//                    initAudio();
-//                },e->{
-//                    e.printStackTrace();
-//                });
                 //读取配置文件，重启系统
-                SysConfig sysConfig= (SysConfig) JSON.parse(FileUtil.readString(Constants.SYS_CONFIG_PATH+"config.json", Charset.forName("UTF-8")));
-                setIp(sysConfig.getIp(),sysConfig.getSubmask(),sysConfig.getGateway());
+                SysConfig sysConfig= (SysConfig) JSON.parse(com.cow.liucy.libcommon.utils.FileUtils.readFile(Constants.SYS_CONFIG_PATH+"config.json"));
+                setConfig(sysConfig);
 
             }
 
@@ -307,10 +296,12 @@ public class MainActivity extends BaseActivity {
 
     }
 
-    private void setIp(String localIp, String mask, String localGateway) {
-        int maskInt = NetUtil.maskStr2InetMask(mask);
-        String ipAndMask = localIp + "/" + maskInt;
+    private void setConfig(SysConfig sysConfig) {
+        int maskInt = NetUtil.maskStr2InetMask(sysConfig.getSubmask());
+        String ipAndMask = sysConfig.getIp() + "/" + maskInt;
         String localDNS = "114.114.114.114";
+        String localGateway=sysConfig.getGateway();
+        String mask=sysConfig.getSubmask();
         ContentResolver contentResolver = getContentResolver();
         Settings.System.putInt(contentResolver, "ethernet_use_static_ip", 1);
 
@@ -321,20 +312,20 @@ public class MainActivity extends BaseActivity {
         Flowable.just(1)
                 .observeOn(AndroidSchedulers.mainThread())
                 .onBackpressureLatest()
-                .subscribe(integer -> NetUtil.setIp(ipAndMask, localDNS, localGateway), e -> {
-                    e.printStackTrace();
-//                    ToastUtils.getShortToastByString(this, "设置失败！请输入正确的IP信息");
-                });
+                .subscribe(integer -> {
+                    AppPrefs.getInstance().setServer(sysConfig.getTcpServerIP());
+                    AppPrefs.getInstance().setFtpPort(sysConfig.getTcpServerPort());
+                    NetUtil.setIp(ipAndMask, localDNS, localGateway);//设置IP
+                    audiomanager.setStreamVolume(AudioManager.STREAM_MUSIC, sysConfig.getVolume(), AudioManager.FLAG_SHOW_UI);//设置音量
 
-        Flowable.just(0)
-                .observeOn(Schedulers.io())
-                .subscribe(l->{
-                    try {
-                        Thread.sleep(10000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    ShellUtils.execCmd("reboot",false);
+                    ToastUtils.getShortToastByString(Utils.getContext(), "数据拷贝成功！请拔出U盘,10s后自动重启");
+//                    initVideo();
+//                    initAudio();
+                    //重启service
+                    EventBus.getDefault().post(new RebootEvent(true));
+
+                }, e -> {
+                    e.printStackTrace();
                 });
     }
 

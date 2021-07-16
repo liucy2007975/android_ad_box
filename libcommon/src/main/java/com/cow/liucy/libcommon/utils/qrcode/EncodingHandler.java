@@ -14,7 +14,7 @@
 //
 //
 ///**
-// * Created by fanyufeng on 2017-6-30.
+// * Created by cow on 2017-6-30.
 // */
 //
 //public final class EncodingHandler {
