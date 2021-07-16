@@ -2,6 +2,7 @@ package com.cow.liucy.box.ui;
 
 import android.Manifest;
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -18,18 +19,23 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 
 import android.os.Environment;
+import android.provider.Settings;
 import android.view.KeyEvent;
 import android.view.WindowManager;
 
 import com.alibaba.fastjson.JSON;
 import com.blankj.utilcode.util.FileUtils;
+import com.blankj.utilcode.util.ShellUtils;
 import com.cow.liucy.box.service.UdiskEvent;
 import com.cow.liucy.face.R;
 import com.cow.liucy.libcommon.base.BaseActivity;
 import com.cow.liucy.libcommon.logger.AppLogger;
 import com.cow.liucy.libcommon.rxnetty.CommandVo;
 import com.cow.liucy.libcommon.usbmonitor.Constant;
+import com.cow.liucy.libcommon.utils.AppPrefs;
 import com.cow.liucy.libcommon.utils.Constants;
+import com.cow.liucy.libcommon.utils.NetUtil;
+import com.cow.liucy.libcommon.utils.ToastUtils;
 import com.cow.liucy.libcommon.utils.Utils;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.MediaItem;
@@ -49,10 +55,12 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import cn.hutool.core.io.FileUtil;
 import io.reactivex.Flowable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -112,7 +120,7 @@ public class MainActivity extends BaseActivity {
     }
 
     public void initVideo(){
-
+        AppLogger.e(">>>>>>initVideo");
         videoPlayer.clearMediaItems();
         File videoPath=new File(Constants.VIDEO_PATH);
         for (File file : videoPath.listFiles()){
@@ -133,6 +141,7 @@ public class MainActivity extends BaseActivity {
     }
 
     public void initAudio(){
+        AppLogger.e(">>>>>>initAudio");
         audioPlayer.clearMediaItems();
         File audioPath=new File(Constants.AUDIO_PATH);
         for (File file : audioPath.listFiles()){
@@ -268,19 +277,65 @@ public class MainActivity extends BaseActivity {
     public void onUdiskEvent(UdiskEvent udiskEvent) {
         AppLogger.e(">>>>>onUdiskEvent:"+udiskEvent.getPath());
         try{
-            FileUtils.moveDir(udiskEvent.getPath()+"/ad_box", Environment.getExternalStorageDirectory().getPath() + "/ad_box");
-            //读取系统配置文件进行配置；
-            //音频文件、视频文件拷贝至相应目录
-            Flowable.just(0).observeOn(AndroidSchedulers.mainThread()).subscribe(l->{
-                initVideo();
-                initAudio();
-            },e->{
-                e.printStackTrace();
-            });
+            boolean result= FileUtils.copyDir(udiskEvent.getPath() + "/ad_box", Environment.getExternalStorageDirectory().getPath() + "/ad_box",
+                    new FileUtils.OnReplaceListener() {
+                        @Override
+                        public boolean onReplace() {
+                            return true;
+                        }
+                    });
+
+            AppLogger.e(">>>>>result:"+result);
+            if (result){
+                //读取系统配置文件进行配置；
+                //音频文件、视频文件拷贝至相应目录
+//                Flowable.just(0).observeOn(AndroidSchedulers.mainThread()).subscribe(l->{
+//                    initVideo();
+//                    initAudio();
+//                },e->{
+//                    e.printStackTrace();
+//                });
+                //读取配置文件，重启系统
+                SysConfig sysConfig= (SysConfig) JSON.parse(FileUtil.readString(Constants.SYS_CONFIG_PATH+"config.json", Charset.forName("UTF-8")));
+                setIp(sysConfig.getIp(),sysConfig.getSubmask(),sysConfig.getGateway());
+
+            }
+
         }catch (Exception ee){
             ee.printStackTrace();
         }
 
+    }
+
+    private void setIp(String localIp, String mask, String localGateway) {
+        int maskInt = NetUtil.maskStr2InetMask(mask);
+        String ipAndMask = localIp + "/" + maskInt;
+        String localDNS = "114.114.114.114";
+        ContentResolver contentResolver = getContentResolver();
+        Settings.System.putInt(contentResolver, "ethernet_use_static_ip", 1);
+
+        Settings.System.putString(contentResolver, "ethernet_static_ip", ipAndMask);
+        Settings.System.putString(contentResolver, "ethernet_static_gateway", localGateway);
+        Settings.System.putString(contentResolver, "ethernet_static_netmask", mask);
+        Settings.System.putString(contentResolver, "ethernet_static_dns1", localDNS);
+        Flowable.just(1)
+                .observeOn(AndroidSchedulers.mainThread())
+                .onBackpressureLatest()
+                .subscribe(integer -> NetUtil.setIp(ipAndMask, localDNS, localGateway), e -> {
+                    e.printStackTrace();
+//                    ToastUtils.getShortToastByString(this, "设置失败！请输入正确的IP信息");
+                });
+
+        Flowable.just(0)
+                .observeOn(Schedulers.io())
+                .subscribe(l->{
+                    try {
+                        Thread.sleep(10000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    ShellUtils.execCmd("reboot",false);
+                });
     }
 
     /**
