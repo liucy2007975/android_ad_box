@@ -199,11 +199,8 @@ public class MainActivity extends BaseActivity {
 
         videoPlayer.setRepeatMode(Player.REPEAT_MODE_ALL);
 
-//        videoPlayer.setVolume(0f);//静音
         //  准备播放
         videoPlayer.prepare();
-        // 开始播放
-//        videoPlayer.play();
         videoPlayer.setPlayWhenReady(true);
 
 
@@ -305,7 +302,14 @@ public class MainActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         AppLogger.e(">>>>>>onDestroy");
-        videoPlayerView.getPlayer().release();
+        if (videoPlayer!=null) {
+            videoPlayer.release();
+            videoPlayer=null;
+        }
+        if (audioPlayer!=null) {
+            audioPlayer.release();
+            audioPlayer=null;
+        }
         EventBus.getDefault().unregister(this);
     }
 
