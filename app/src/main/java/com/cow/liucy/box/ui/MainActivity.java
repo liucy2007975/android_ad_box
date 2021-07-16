@@ -102,117 +102,54 @@ public class MainActivity extends BaseActivity {
                 .build();
         audioPlayer = new SimpleExoPlayer.Builder(this)
                 .build();
+        AppLogger.e(">>>>最大音量："+audiomanager.getStreamMaxVolume(AudioManager.STREAM_MUSIC));//最大值： 100
 
-        audioPlayer.addListener(new Player.Listener() {
-            @Override
-            public void onPlaybackStateChanged(int state) {
-                AppLogger.e(">>>>audioPlayer>onPlaybackStateChanged:"+state);
-            }
-
-            @Override
-            public void onMediaItemTransition(
-                    @Nullable MediaItem mediaItem, @Player.MediaItemTransitionReason int reason) {
-                AppLogger.e(">>>>audioPlayer>onMediaItemTransition:");
-
-            }
-
-            @Override
-            public void onTimelineChanged(
-                    Timeline timeline, @Player.TimelineChangeReason int reason) {
-                if (reason == TIMELINE_CHANGE_REASON_PLAYLIST_CHANGED) {
-                    // Update the UI according to the modified playlist (add, move or remove).
-                    AppLogger.e(">>>>audioPlayer>onTimelineChanged:"+reason);
-                }
-            }
-
-            @Override
-            public void onPositionDiscontinuity(Player.PositionInfo oldPosition, Player.PositionInfo newPosition, int reason) {
-                AppLogger.e(">>>>audioPlayer>onPositionDiscontinuity:"+reason);
-            }
-
-        });
-
-        videoPlayer.addListener(new Player.Listener() {
-            @Override
-            public void onPlaybackStateChanged(int state) {
-                AppLogger.e(">>>>videoPlayer>onPlaybackStateChanged:"+state);
-                switch (state){
-                    case Player.STATE_READY:
-                        break;
-                    case Player.STATE_ENDED:
-                        break;
-                }
-            }
-            @Override
-            public void onMediaItemTransition(
-                    @Nullable MediaItem mediaItem, @Player.MediaItemTransitionReason int reason) {
-                AppLogger.e(">>>>videoPlayer>onMediaItemTransition:");
-                if (mediaItem != null && mediaItem.playbackProperties != null) {
-                    AppLogger.e(">>>>>mediaItem!=null");
-//                    videoPlayer.prepare();
-//                    videoPlayer.play();
-                }
-            }
-
-
-            @Override
-            public void onTimelineChanged(
-                    Timeline timeline, @Player.TimelineChangeReason int reason) {
-                if (reason == TIMELINE_CHANGE_REASON_PLAYLIST_CHANGED) {
-                    // Update the UI according to the modified playlist (add, move or remove).
-                    AppLogger.e(">>>>videoPlayer>onTimelineChanged:"+reason);
-                }
-            }
-
-            @Override
-            public void onPositionDiscontinuity(Player.PositionInfo oldPosition, Player.PositionInfo newPosition, int reason) {
-                AppLogger.e(">>>>videoPlayer>onPositionDiscontinuity:oldPosition:"+oldPosition.windowIndex+">>>>newPosition:"+newPosition.windowIndex);
-            }
-        });
+        audiomanager.setStreamVolume(AudioManager.STREAM_MUSIC, 10, AudioManager.FLAG_SHOW_UI);
 
         videoPlayerView.setPlayer(videoPlayer);
+        initVideo();
+        initAudio();
+    }
 
-        File audioPath=new File(Constants.AUDIO_PATH);
-        for (File file : audioPath.listFiles()){
-            Uri uri = null;
-            if(file.exists()) {
-                uri = Uri.fromFile(file);
-                MediaItem item = MediaItem.fromUri(uri);
-                audioPlayer.addMediaItem(item);
-            }
-        }
+    public void initVideo(){
 
-
+        videoPlayer.clearMediaItems();
         File videoPath=new File(Constants.VIDEO_PATH);
-        for (int i=0;i<videoPath.listFiles().length;i++){
-            File file=videoPath.listFiles()[i];
-            Uri uri = null;
-            if(file.exists()) {
-                String index=file.getName().substring(0,file.getName().length()-4);
-                AppLogger.e(">>>index:"+index);
-                uri = Uri.fromFile(file);
-                MediaItem item = MediaItem.fromUri(uri);
-                videoIndexNameMap.put(index,i);
-                videoPlayer.addMediaItem(i,item);
+        for (File file : videoPath.listFiles()){
+            if (file.getName().endsWith(".mp4")){
+                Uri uri = null;
+                if(file.exists()) {
+                    uri = Uri.fromFile(file);
+                    MediaItem item = MediaItem.fromUri(uri);
+                    videoPlayer.addMediaItem(item);
+                }
             }
         }
-
         videoPlayer.setRepeatMode(Player.REPEAT_MODE_ALL);
 
         //  准备播放
         videoPlayer.prepare();
         videoPlayer.setPlayWhenReady(true);
+    }
 
-
-        AppLogger.e(">>>>最大音量："+audiomanager.getStreamMaxVolume(AudioManager.STREAM_MUSIC));//最大值： 100
-
-        audiomanager.setStreamVolume(AudioManager.STREAM_MUSIC, 10, AudioManager.FLAG_SHOW_UI);
-
-        audioPlayer.setVolume(0f);
+    public void initAudio(){
+        audioPlayer.clearMediaItems();
+        File audioPath=new File(Constants.AUDIO_PATH);
+        for (File file : audioPath.listFiles()){
+            if (file.getName().endsWith(".mp3")){
+                Uri uri = null;
+                if(file.exists()) {
+                    uri = Uri.fromFile(file);
+                    MediaItem item = MediaItem.fromUri(uri);
+                    audioPlayer.addMediaItem(item);
+                }
+            }
+        }
+//        audioPlayer.setVolume(1f);
+        audioPlayer.setRepeatMode(Player.REPEAT_MODE_ALL);
         //  准备播放
         audioPlayer.prepare();
         // 开始播放
-//        audioPlayer.play();
         audioPlayer.setPlayWhenReady(true);
     }
 
@@ -330,10 +267,19 @@ public class MainActivity extends BaseActivity {
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onUdiskEvent(UdiskEvent udiskEvent) {
         AppLogger.e(">>>>>onUdiskEvent:"+udiskEvent.getPath());
-
-        FileUtils.copyDir(udiskEvent.getPath()+"/ad_box", Environment.getExternalStorageDirectory().getPath() + "/ad_box");
-        //读取系统配置文件进行配置；
-        //音频文件、视频文件拷贝至相应目录
+        try{
+            FileUtils.moveDir(udiskEvent.getPath()+"/ad_box", Environment.getExternalStorageDirectory().getPath() + "/ad_box");
+            //读取系统配置文件进行配置；
+            //音频文件、视频文件拷贝至相应目录
+            Flowable.just(0).observeOn(AndroidSchedulers.mainThread()).subscribe(l->{
+                initVideo();
+                initAudio();
+            },e->{
+                e.printStackTrace();
+            });
+        }catch (Exception ee){
+            ee.printStackTrace();
+        }
 
     }
 
@@ -361,8 +307,6 @@ public class MainActivity extends BaseActivity {
                 }
                 AppLogger.e(">>>>>开始播放视频:"+ file.getName());
 
-
-//                videoPlayer.clearMediaItems();
                 Uri uri = Uri.fromFile(file);
                 MediaItem item = MediaItem.fromUri(uri);
 //                // 暂停播放
