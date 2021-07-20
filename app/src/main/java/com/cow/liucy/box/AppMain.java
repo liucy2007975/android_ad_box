@@ -99,6 +99,7 @@ public class AppMain extends BaseApplication {
         FileUtils.isExist(Constants.AUDIO_PATH);
         FileUtils.isExist(Constants.SYS_CONFIG_PATH);
         FileUtils.isExist(Constants.FTP_DEF_PATH);
+        FileUtils.isExist(Constants.PICTURE_PATH);
     }
 
 

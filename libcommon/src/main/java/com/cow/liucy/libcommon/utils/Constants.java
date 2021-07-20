@@ -20,6 +20,7 @@ public class Constants {
 //    public static final String PICTURE_PATH = APP_DEF_PATH + "picture/";
     public static final String VIDEO_PATH = APP_DEF_PATH + "video/";
     public static final String AUDIO_PATH = APP_DEF_PATH + "audio/";
+    public static final String PICTURE_PATH = APP_DEF_PATH + "picture/";
     public static final String INSTALL_APK_PATH = APP_DEF_PATH + "app/";
     public static final String SYS_CONFIG_PATH = APP_DEF_PATH + "sysconfig/";
     public static final String USB_PATH = "/mnt/usb_storage/USB_DISK2/udisk0/ad_box/";

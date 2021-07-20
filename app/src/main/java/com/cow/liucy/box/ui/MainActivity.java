@@ -21,10 +21,13 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.os.Environment;
 import android.provider.Settings;
 import android.view.KeyEvent;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageView;
 
 import com.alibaba.fastjson.JSON;
 import com.blankj.utilcode.util.ShellUtils;
+import com.bumptech.glide.Glide;
 import com.cow.liucy.box.service.RebootEvent;
 import com.cow.liucy.box.service.UdiskEvent;
 import com.cow.liucy.face.R;
@@ -60,12 +63,14 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import cn.hutool.core.io.FileUtil;
 import io.reactivex.Flowable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
+import static com.cow.liucy.libcommon.utils.Constants.PICTURE_PATH;
 import static com.google.android.exoplayer2.Player.TIMELINE_CHANGE_REASON_PLAYLIST_CHANGED;
 
 
@@ -91,6 +96,7 @@ public class MainActivity extends BaseActivity {
     AudioManager audiomanager;//音频管理器
     private CommandVo commandVo=null;//当前播放指令
     private Map<String,Integer> videoIndexNameMap=new HashMap<String,Integer>();
+    private ImageView ad_pic;
 
 
 
@@ -106,6 +112,7 @@ public class MainActivity extends BaseActivity {
         audiomanager=(AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
         videoPlayerView = findViewById(R.id.player_view);
+        ad_pic=findViewById(R.id.ad_pic);
 
         videoPlayer = new SimpleExoPlayer.Builder(this)
                 .build();
@@ -118,49 +125,78 @@ public class MainActivity extends BaseActivity {
         videoPlayerView.setPlayer(videoPlayer);
         initVideo();
         initAudio();
+
+        //本地文件
+        File file = new File(PICTURE_PATH+"logo.jpg");
+        //加载图片
+        Glide.with(this).load(file).into(ad_pic);
+        ad_pic.setVisibility(View.VISIBLE);
+        videoPlayerView.setVisibility(View.GONE);
+
+
+        /**
+         * 3s检测一次视频播放状态，如果当前状态不在播放，则展示广告图片
+         */
+        Flowable.interval(3, TimeUnit.SECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(l-> {
+
+                    if (videoPlayer.isPlaying()){
+                        AppLogger.e(">>>>>>isPlaying>>>");
+                        ad_pic.setVisibility(View.GONE);
+                        videoPlayerView.setVisibility(View.VISIBLE);
+                    }else{
+                        AppLogger.e(">>>>>>not Playing>>>");
+
+                        ad_pic.setVisibility(View.VISIBLE);
+                        videoPlayerView.setVisibility(View.GONE);
+                    }
+                },e->{
+                    e.printStackTrace();
+                });
     }
 
     public void initVideo(){
         AppLogger.e(">>>>>>initVideo");
         videoPlayer.clearMediaItems();
-        File videoPath=new File(Constants.VIDEO_PATH);
-        for (File file : videoPath.listFiles()){
-            if (file.getName().endsWith(".mp4")){
-                Uri uri = null;
-                if(file.exists()) {
-                    uri = Uri.fromFile(file);
-                    MediaItem item = MediaItem.fromUri(uri);
-                    videoPlayer.addMediaItem(item);
-                }
-            }
-        }
-        videoPlayer.setRepeatMode(Player.REPEAT_MODE_ALL);
-
-        //  准备播放
-        videoPlayer.prepare();
-        videoPlayer.setPlayWhenReady(true);
+//        File videoPath=new File(Constants.VIDEO_PATH);
+//        for (File file : videoPath.listFiles()){
+//            if (file.getName().endsWith(".mp4")){
+//                Uri uri = null;
+//                if(file.exists()) {
+//                    uri = Uri.fromFile(file);
+//                    MediaItem item = MediaItem.fromUri(uri);
+//                    videoPlayer.addMediaItem(item);
+//                }
+//            }
+//        }
+//        videoPlayer.setRepeatMode(Player.REPEAT_MODE_ALL);
+//
+//        //  准备播放
+//        videoPlayer.prepare();
+//        videoPlayer.setPlayWhenReady(true);
     }
 
     public void initAudio(){
         AppLogger.e(">>>>>>initAudio");
         audioPlayer.clearMediaItems();
-        File audioPath=new File(Constants.AUDIO_PATH);
-        for (File file : audioPath.listFiles()){
-            if (file.getName().endsWith(".mp3")){
-                Uri uri = null;
-                if(file.exists()) {
-                    uri = Uri.fromFile(file);
-                    MediaItem item = MediaItem.fromUri(uri);
-                    audioPlayer.addMediaItem(item);
-                }
-            }
-        }
-//        audioPlayer.setVolume(1f);
-        audioPlayer.setRepeatMode(Player.REPEAT_MODE_ALL);
-        //  准备播放
-        audioPlayer.prepare();
-        // 开始播放
-        audioPlayer.setPlayWhenReady(true);
+//        File audioPath=new File(Constants.AUDIO_PATH);
+//        for (File file : audioPath.listFiles()){
+//            if (file.getName().endsWith(".mp3")){
+//                Uri uri = null;
+//                if(file.exists()) {
+//                    uri = Uri.fromFile(file);
+//                    MediaItem item = MediaItem.fromUri(uri);
+//                    audioPlayer.addMediaItem(item);
+//                }
+//            }
+//        }
+////        audioPlayer.setVolume(1f);
+//        audioPlayer.setRepeatMode(Player.REPEAT_MODE_ALL);
+//        //  准备播放
+//        audioPlayer.prepare();
+//        // 开始播放
+//        audioPlayer.setPlayWhenReady(true);
     }
 
     @Override
@@ -342,7 +378,8 @@ public class MainActivity extends BaseActivity {
             //播放指定视频逻辑
             File file=new File(Constants.VIDEO_PATH+commandVo.getVideoNo()+".mp4");
             if (file.exists()){
-
+                ad_pic.setVisibility(View.GONE);
+                videoPlayerView.setVisibility(View.VISIBLE);
                 videoPlayer.setRepeatMode(Player.REPEAT_MODE_OFF);
                 int videoNo=Integer.parseInt(commandVo.getVideoNo());
 
