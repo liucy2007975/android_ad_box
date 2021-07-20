@@ -142,11 +142,11 @@ public class MainActivity extends BaseActivity {
                 .subscribe(l-> {
 
                     if (videoPlayer.isPlaying()){
-                        AppLogger.e(">>>>>>isPlaying>>>");
+//                        AppLogger.e(">>>>>>isPlaying>>>");
                         ad_pic.setVisibility(View.GONE);
                         videoPlayerView.setVisibility(View.VISIBLE);
                     }else{
-                        AppLogger.e(">>>>>>not Playing>>>");
+//                        AppLogger.e(">>>>>>not Playing>>>");
 
                         ad_pic.setVisibility(View.VISIBLE);
                         videoPlayerView.setVisibility(View.GONE);
