@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">广告机</string>
+    <string name="app_name">AD_BOX</string>
     <string name="about_gateway">网关：</string>
     <string name="about_hardware_version">硬件版本：</string>
     <string name="about_ip">IP地址：</string>

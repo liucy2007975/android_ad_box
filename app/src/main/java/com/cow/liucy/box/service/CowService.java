@@ -208,7 +208,7 @@ public class CowService extends Service   {
     private void showNotification() {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this.getApplicationContext(), "1");
         builder.setSmallIcon(R.mipmap.ic_launcher);
-        builder.setContentTitle("广告机服务");
+        builder.setContentTitle("AD_BOX服务");
         builder.setContentText("服务正在运行...");
         builder.setContentInfo("");
         builder.setWhen(System.currentTimeMillis());

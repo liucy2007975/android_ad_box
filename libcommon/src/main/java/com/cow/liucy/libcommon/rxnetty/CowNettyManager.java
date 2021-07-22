@@ -76,7 +76,7 @@ public class CowNettyManager {
                 .channelOption(ChannelOption.TCP_NODELAY, true)
                 .channelOption(ChannelOption.AUTO_READ, true)
                 //设置读取超时时间，
-                .readTimeOut(KEEP_ALIVED_TIME * 10 , TimeUnit.SECONDS)
+                .readTimeOut(KEEP_ALIVED_TIME + 15 , TimeUnit.SECONDS)
                 .createConnectionRequest()
                 .subscribeOn(rx.schedulers.Schedulers.io())
                 .subscribe(newConnection -> {
