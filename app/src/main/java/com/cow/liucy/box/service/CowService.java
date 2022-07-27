@@ -28,10 +28,18 @@ import com.cow.liucy.libcommon.rxnetty.CowNettyManager;
 import com.blankj.utilcode.util.ShellUtils;
 
 
+import org.apache.ftpserver.FtpServer;
+import org.apache.ftpserver.FtpServerFactory;
+import org.apache.ftpserver.ftplet.Authority;
+import org.apache.ftpserver.listener.ListenerFactory;
+import org.apache.ftpserver.usermanager.impl.BaseUser;
+import org.apache.ftpserver.usermanager.impl.WritePermission;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Flowable;
@@ -57,6 +65,8 @@ public class CowService extends Service   {
     private static final String HTTP_SET="/set";
 
     private Disposable mDisposableRecreate;
+
+    private FtpServer ftpServer;
 
 
     @Nullable
@@ -90,6 +100,65 @@ public class CowService extends Service   {
     }
 
 
+    //启动Ftp Server
+    private void startFTPServer(){
+//            compositeDisposable.add(Flowable.just(0).subscribe(
+//                    l->{
+        ListenerFactory factory = new ListenerFactory();
+        factory.setPort(2121);
+//                        factory.setServerAddress("192.168.46.125");
+        FtpServerFactory serverFactory = new FtpServerFactory();
+        serverFactory.addListener("default", factory.createListener());
+        //FTP用户名
+        BaseUser user = new BaseUser();
+        user.setName("admin");
+        user.setPassword("654321");
+        //FTP根目录
+        String rootPath= Environment.getExternalStorageDirectory().getPath();
+        AppLogger.e(">>>>>>rootPath:"+rootPath);
+        user.setHomeDirectory(rootPath);
+        //FTP权限
+        List<Authority> authorities = new ArrayList<Authority>();
+        authorities.add(new WritePermission());
+        user.setAuthorities(authorities);
+        try {
+            serverFactory.getUserManager().save(user);
+            if(ftpServer != null) {
+                ftpServer.stop();
+            }
+            ftpServer = serverFactory.createServer();
+            ftpServer.start();
+            AppLogger.e(">>>>FTP Server start success!");
+        }catch (Exception e){
+            e.printStackTrace();
+            AppLogger.e(">>>>FTP Server start failed!");
+        }
+
+//                    },e->{
+//                        e.printStackTrace();
+//                        AppLogger.e(">>>>FTP Server start failed!");
+//                    }
+//            ));
+    }
+
+    //停止FTP Server
+    private void stopFTPServer(){
+//        if (ftpServer!=null) {
+//            compositeDisposable.add(Flowable.just(0).subscribe(
+//                    l -> {
+        if (ftpServer != null) {
+            ftpServer.stop();
+        }
+        ftpServer = null;
+        AppLogger.e(">>>>FTP Server stop success!");
+//                    }, e -> {
+//                        e.printStackTrace();
+//                        AppLogger.e(">>>>FTP Server stop failed!");
+//                    }
+//            ));
+//        }
+    }
+
    @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onRebootEvent(RebootEvent rebootEvent) {
         if (rebootEvent.isReboot()){
@@ -122,6 +191,8 @@ public class CowService extends Service   {
         if (Valid.valid(localIp)){
             AppLogger.e(">>>>localIp:"+localIp);
 
+            stopFTPServer();
+            startFTPServer();
             if (cowNettyManager!=null){
                 cowNettyManager.stop();
                 cowNettyManager=null;
@@ -149,6 +220,7 @@ public class CowService extends Service   {
             cowNettyManager.start();
 
             cancelReconnect();
+
         }else{
             AppLogger.e(">>>>设备还未配置IP地址");
             reCreate();
@@ -191,6 +263,7 @@ public class CowService extends Service   {
     public void onDestroy() {
         isFinish = true;
         super.onDestroy();
+        stopFTPServer();
         if (cowNettyManager!=null){
             cowNettyManager.stop();
             cowNettyManager=null;

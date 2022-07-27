@@ -52,7 +52,7 @@ ext{
     buildTools = "28.0.3"
     //version code/name
     vCode = 20210720
-    vName = "1.0.1"
+    vName = "1.0.2"
 
     //Test dependencies
     junitVersion = '4.12'

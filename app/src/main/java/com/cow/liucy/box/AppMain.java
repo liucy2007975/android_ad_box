@@ -7,8 +7,8 @@ import com.cow.liucy.box.service.CowService;
 import com.cow.liucy.face.BuildConfig;
 
 import com.cow.liucy.libcommon.base.BaseApplication;
-import com.cow.liucy.libcommon.db.CowBoxStore;
-import com.cow.liucy.libcommon.db.objectbox.MyObjectBox;
+//import com.cow.liucy.libcommon.db.CowBoxStore;
+//import com.cow.liucy.libcommon.db.objectbox.MyObjectBox;
 import com.cow.liucy.libcommon.logger.AppLogger;
 import com.cow.liucy.libcommon.utils.Constants;
 import com.cow.liucy.libcommon.utils.CrashUtils;
@@ -34,21 +34,21 @@ public class AppMain extends BaseApplication {
         AppLogger.e(">>>>AppMain onCreate");
         Utils.init(this);
         CrashUtils.init();
-        //设置最大读事务
-        MyObjectBox.builder().maxReaders(1000);
-        MyObjectBox.builder().queryAttempts(2);
-        CowBoxStore.boxStore = MyObjectBox.builder().androidContext(this).build();
-        if (BuildConfig.DEBUG) {
-            boolean started = new AndroidObjectBrowser(CowBoxStore.boxStore).start(this);
-            Log.i("ObjectBrowser", "Started: " + started);
-        }
-        CowBoxStore.boxStore.setDbExceptionListener(new DbExceptionListener() {
-            @Override
-            public void onDbException(Exception e) {
-                AppLogger.e(">>>>>CowBoxStore diagnose:" + CowBoxStore.boxStore.diagnose());
-                AppLogger.e(">>>>>CowBoxStore Exception:" + e.getMessage());
-            }
-        });
+//        //设置最大读事务
+//        MyObjectBox.builder().maxReaders(1000);
+//        MyObjectBox.builder().queryAttempts(2);
+//        CowBoxStore.boxStore = MyObjectBox.builder().androidContext(this).build();
+//        if (BuildConfig.DEBUG) {
+//            boolean started = new AndroidObjectBrowser(CowBoxStore.boxStore).start(this);
+//            Log.i("ObjectBrowser", "Started: " + started);
+//        }
+//        CowBoxStore.boxStore.setDbExceptionListener(new DbExceptionListener() {
+//            @Override
+//            public void onDbException(Exception e) {
+//                AppLogger.e(">>>>>CowBoxStore diagnose:" + CowBoxStore.boxStore.diagnose());
+//                AppLogger.e(">>>>>CowBoxStore Exception:" + e.getMessage());
+//            }
+//        });
         checkAndCreateDefDir();
 //        initData();
 //        AppUtils.init(this);

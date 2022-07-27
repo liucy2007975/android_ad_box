@@ -15,11 +15,11 @@ android {
         versionCode rootProject.ext.vCode
         versionName rootProject.ext.vName
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
-        externalNativeBuild {
-            cmake {
-                cppFlags ""
-            }
-        }
+//        externalNativeBuild {
+//            cmake {
+//                cppFlags ""
+//            }
+//        }
         dexOptions {
             javaMaxHeapSize "4g"
         }
@@ -68,11 +68,11 @@ android {
             signingConfig signingConfigs.signConfig // 配置release包的签名
         }
     }
-    externalNativeBuild {
-        cmake {
-            path "CMakeLists.txt"
-        }
-    }
+//    externalNativeBuild {
+//        cmake {
+//            path "CMakeLists.txt"
+//        }
+//    }
     lintOptions {
         // 忽略 lint 检测出的错误，当然好的应用是应该打开这个选项
         // 但是打开后，只要 lint 检测出错误，就会编译失败，例如使用高于 min sdk level 的 api，layout 中缺少某几个元素的配置等等
@@ -140,6 +140,7 @@ android {
         resolutionStrategy{
             force "com.android.support:support-annotations:${rootProject.ext.support}"
             force "com.android.support:appcompat-v7:${rootProject.ext.support}"
+            force "org.slf4j:slf4j-api:1.7.21"
         }
     }
 }
@@ -215,6 +216,9 @@ dependencies {
 
     implementation 'com.github.bumptech.glide:glide:4.12.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
+
+    implementation project(':apache-ftpserver-1.1.1:core')
+    implementation project(':apache-ftpserver-1.1.1:ftplet-api')
 
 
 }
