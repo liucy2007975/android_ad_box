@@ -1,3 +1,3 @@
-# smartparking_box
+# android_ad_box
 
-Android停车数据采集盒子
+Android广告机
